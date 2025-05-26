@@ -8,10 +8,11 @@ const typeSchema = new mongoose.Schema(
       trim: true,
       lowercase: true,
       minLenght: 2,
+      unique: true,
     },
     image: {
       type: String,
-      required: false,
+      required: [false, "Type image is required"],
       trim: true,
       minLenght: 10,
     },

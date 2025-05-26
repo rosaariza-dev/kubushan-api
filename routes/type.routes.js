@@ -1,29 +1,25 @@
 import { Router } from "express";
+import {
+  createType,
+  deleteType,
+  getProductsByType,
+  getType,
+  getTypes,
+  updateType,
+} from "../controllers/type.controller.js";
 
 const typeRouter = Router();
 
-typeRouter.get("/", (req, res) => {
-  res.send({ message: "GET all types" });
-});
+typeRouter.get("/", getTypes);
 
-typeRouter.get("/:id", (req, res) => {
-  res.send({ message: "GET type" });
-});
+typeRouter.get("/:id", getType);
 
-typeRouter.get("/:id/products", (req, res) => {
-  res.send({ message: "GET products for type" });
-});
+typeRouter.get("/:id/products", getProductsByType);
 
-typeRouter.post("/", (req, res) => {
-  res.send({ message: "CREATE new type" });
-});
+typeRouter.post("/", createType);
 
-typeRouter.put("/:id", (req, res) => {
-  res.send({ message: "UPDATE type" });
-});
+typeRouter.put("/:id", updateType);
 
-typeRouter.delete("/:id", (req, res) => {
-  res.send({ message: "DELETE type" });
-});
+typeRouter.delete("/:id", deleteType);
 
 export default typeRouter;
