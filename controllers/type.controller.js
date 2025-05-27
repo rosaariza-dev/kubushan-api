@@ -89,7 +89,7 @@ export const updateType = async (req, res, next) => {
       throw error;
     }
 
-    session.commitTransaction();
+    await session.commitTransaction();
     session.endSession();
 
     res.status(200).json({
@@ -98,7 +98,7 @@ export const updateType = async (req, res, next) => {
       data: updateType,
     });
   } catch (error) {
-    session.abortTransaction();
+    await session.abortTransaction();
     session.endSession();
     next(error);
   }
@@ -116,7 +116,7 @@ export const deleteType = async (req, res, next) => {
     }
 
     await Type.deleteOne({ _id: type._id }, { session });
-    session.commitTransaction();
+    await session.commitTransaction();
     session.endSession();
 
     res.status(200).json({
@@ -125,7 +125,7 @@ export const deleteType = async (req, res, next) => {
       data: type,
     });
   } catch (error) {
-    session.abortTransaction();
+    await session.abortTransaction();
     session.endSession();
     next(error);
   }
