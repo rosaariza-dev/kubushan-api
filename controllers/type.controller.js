@@ -89,7 +89,7 @@ export const updateType = async (req, res, next) => {
       throw error;
     }
 
-    await session.commitTransaction();
+    session.commitTransaction();
     session.endSession();
 
     res.status(200).json({

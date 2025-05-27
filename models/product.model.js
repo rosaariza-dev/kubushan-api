@@ -26,12 +26,12 @@ const productSchema = new mongoose.Schema(
       required: false,
       minLenght: 10,
       trim: true,
-      lowercase: true
+      lowercase: true,
     },
     type: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Type",
-      required: true,
+      required: [true, "Product type is required"],
       index: true,
     },
   },
