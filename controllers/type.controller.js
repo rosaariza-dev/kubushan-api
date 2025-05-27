@@ -28,14 +28,14 @@ export const getType = async (req, res, next) => {
 
 export const getProductsByType = async (req, res, next) => {
   try {
-    const type = await Type.findOne(req.params.id);
+    const type = await Type.findById(req.params.id);
     if (!type) {
       const error = new Error("Type not found");
       error.statusCode = 404;
       throw error;
     }
 
-    const productsByType = await Product.findMany(type._id);
+    const productsByType = await Product.find({ type: type._id });
     res.status(200).json({
       success: true,
       data: productsByType,
