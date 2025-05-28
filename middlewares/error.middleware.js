@@ -1,3 +1,5 @@
+import { ZodError } from "zod/v4";
+
 const errorMiddleware = (err, req, res, next) => {
   try {
     let error = { ...err };
@@ -20,7 +22,14 @@ const errorMiddleware = (err, req, res, next) => {
 
     // Mongoose validation error
     if (err.name === "ValidationError") {
-      const message = Object.values(err.errors).map((val) => val.message);
+      const message = Object.values(err).map((val) => val.message);
+      error = new Error(message.join(","));
+      error.statusCode = 400;
+    }
+
+    // Zod error
+    if (err instanceof ZodError) {
+      const message = err.issues.map((errorItem) => errorItem.message);
       error = new Error(message.join(","));
       error.statusCode = 400;
     }

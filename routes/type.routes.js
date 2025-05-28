@@ -7,19 +7,31 @@ import {
   getTypes,
   updateType,
 } from "../controllers/type.controller.js";
+import validateMiddleware from "../middlewares/validate.middleware.js";
+import {
+  createTypeSchema,
+  deleteTypeSchema,
+  getProductsByTypeSchema,
+  getTypeSchema,
+  updateTypeSchema,
+} from "../validations/type.schema.js";
 
 const typeRouter = Router();
 
 typeRouter.get("/", getTypes);
 
-typeRouter.get("/:id", getType);
+typeRouter.get("/:id", validateMiddleware(getTypeSchema), getType);
 
-typeRouter.get("/:id/products", getProductsByType);
+typeRouter.get(
+  "/:id/products",
+  validateMiddleware(getProductsByTypeSchema),
+  getProductsByType
+);
 
-typeRouter.post("/", createType);
+typeRouter.post("/", validateMiddleware(createTypeSchema), createType);
 
-typeRouter.put("/:id", updateType);
+typeRouter.put("/:id", validateMiddleware(updateTypeSchema), updateType);
 
-typeRouter.delete("/:id", deleteType);
+typeRouter.delete("/:id", validateMiddleware(deleteTypeSchema), deleteType);
 
 export default typeRouter;
