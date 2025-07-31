@@ -5,6 +5,7 @@ import typeRouter from "./routes/type.routes.js";
 import productRouter from "./routes/product.routes.js";
 import imageRouter from "./routes/image.routes.js";
 import errorMiddleware from "./middlewares/error.middleware.js";
+import "./config/cloudinary.js";
 
 const app = express();
 
