@@ -1,7 +1,10 @@
 import mongoose from "mongoose";
 import Product from "../models/product.model.js";
 import Type from "../models/type.model.js";
-import { uploadImageCloudinary } from "./image.controller.js";
+import {
+  getImageCloudinary,
+  uploadImageCloudinary,
+} from "./image.controller.js";
 
 export const getProducts = async (req, res, next) => {
   try {
@@ -145,6 +148,34 @@ export const uploadImageProduct = async (req, res, next) => {
     res.send({
       success: true,
       message: "Imagen cargada correctamente",
+      data: {
+        public_id: result.public_id,
+        secure_url: result.secure_url,
+        url: result.url,
+        format: result.format,
+        width: result.width,
+        height: result.height,
+        resource_type: result.resource_type,
+        asset_folder: result.asset_folder,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getImageProduct = async (req, res, next) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      const error = new Error("Product not found");
+      error.statusCode = 404;
+      throw error;
+    }
+    const result = await getImageCloudinary(req.params.id, next);
+    res.send({
+      success: true,
+      message: "Imagen consultada correctamente",
       data: {
         public_id: result.public_id,
         secure_url: result.secure_url,

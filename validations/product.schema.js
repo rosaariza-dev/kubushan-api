@@ -60,3 +60,5 @@ export const updateProductSchema = object({
 export const deleteProductSchema = validateParamsSchema;
 
 export const uploadImageProductSchema = validateParamsSchema;
+
+export const getImageProductSchema = validateParamsSchema;
