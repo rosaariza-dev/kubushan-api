@@ -10,10 +10,6 @@ imageRouter.get("/:id", (req, res) => {
   res.send({ message: "GET image" });
 });
 
-imageRouter.post("/upload", (req, res) => {
-  res.send({ message: "UPLOAD image" });
-});
-
 imageRouter.delete("/:id", (req, res) => {
   res.send({ message: "DELETE image" });
 });

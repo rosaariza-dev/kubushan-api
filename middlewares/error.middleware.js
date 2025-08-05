@@ -27,6 +27,13 @@ const errorMiddleware = (err, req, res, next) => {
       error.statusCode = 400;
     }
 
+    // Manejar error específico de PayloadTooLargeError
+    if (err.type === "entity.too.large") {
+      const message = "File too large. Maximum size allowed is 10MB";
+      error = new Error(message);
+      error.statusCode = 413;
+    }
+
     // Zod error
     if (err instanceof ZodError) {
       const message = err.issues.map((errorItem) => errorItem.message);

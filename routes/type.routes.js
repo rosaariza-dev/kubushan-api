@@ -6,6 +6,7 @@ import {
   getType,
   getTypes,
   updateType,
+  uploadImageType,
 } from "../controllers/type.controller.js";
 import validateMiddleware from "../middlewares/validate.middleware.js";
 import {
@@ -14,7 +15,9 @@ import {
   getProductsByTypeSchema,
   getTypeSchema,
   updateTypeSchema,
+  uploadImageTypeSchema,
 } from "../validations/type.schema.js";
+import validateImageMiddleware from "../middlewares/image.middleware.js";
 
 const typeRouter = Router();
 
@@ -33,5 +36,12 @@ typeRouter.post("/", validateMiddleware(createTypeSchema), createType);
 typeRouter.put("/:id", validateMiddleware(updateTypeSchema), updateType);
 
 typeRouter.delete("/:id", validateMiddleware(deleteTypeSchema), deleteType);
+
+typeRouter.post(
+  "/:id/images",
+  validateMiddleware(uploadImageTypeSchema),
+  validateImageMiddleware,
+  uploadImageType
+);
 
 export default typeRouter;

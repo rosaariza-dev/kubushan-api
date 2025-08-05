@@ -34,3 +34,5 @@ export const updateTypeSchema = object({
 });
 
 export const deleteTypeSchema = validateParamsSchema;
+
+export const uploadImageTypeSchema = validateParamsSchema;
