@@ -8,3 +8,11 @@ export const validateParamsSchema = object({
     }),
   }),
 });
+
+export const validateParamsImageSchema = object({
+  params: strictObject({
+    publicId: z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
+      message: "Params 'publicId' is not a valid ObjectId",
+    }),
+  }),
+});
