@@ -5,6 +5,7 @@ import {
   getProduct,
   getProducts,
   updateProduct,
+  uploadImageProduct,
 } from "../controllers/product.controller.js";
 import validateMiddleware from "../middlewares/validate.middleware.js";
 import {
@@ -12,7 +13,9 @@ import {
   deleteProductSchema,
   getProductSchema,
   updateProductSchema,
+  uploadImageProductSchema,
 } from "../validations/product.schema.js";
+import validateImageMiddleware from "../middlewares/image.middleware.js";
 
 const productRouter = Router();
 
@@ -32,6 +35,13 @@ productRouter.delete(
   "/:id",
   validateMiddleware(deleteProductSchema),
   deleteProduct
+);
+
+productRouter.post(
+  "/:id/images",
+  validateMiddleware(uploadImageProductSchema),
+  validateImageMiddleware,
+  uploadImageProduct
 );
 
 export default productRouter;
