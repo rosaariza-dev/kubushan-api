@@ -137,8 +137,8 @@ export const deleteProduct = async (req, res, next) => {
 
 export const uploadImageProduct = async (req, res, next) => {
   try {
-    const type = await Product.findById(req.params.id);
-    if (!type) {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
       const error = new Error("Product not found");
       error.statusCode = 404;
       throw error;
