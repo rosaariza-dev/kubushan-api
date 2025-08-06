@@ -106,8 +106,6 @@ export const deleteImageCloudinary = async (publicId, next) => {
 export const getImageCloudinary = async (publicId, next) => {
   try {
     const result = await cloudinary.api.resource(publicId);
-    if (!result) {
-    }
     console.log(result);
     return result;
   } catch (error) {
