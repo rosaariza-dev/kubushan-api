@@ -144,12 +144,20 @@ export const uploadImageType = async (req, res, next) => {
       throw error;
     }
 
-    const result = await uploadImageCloudinary(req.params.id, req.body);
+    const displayName = `type_${type._id}`;
+
+    const result = await uploadImageCloudinary(
+      type._id,
+      req.body,
+      displayName
+    );
+    console.log(result);
     res.send({
       success: true,
       message: "Imagen cargada correctamente",
       data: {
         public_id: result.public_id,
+        display_name: result.display_name,
         secure_url: result.secure_url,
         url: result.url,
         format: result.format,
@@ -172,12 +180,13 @@ export const getImageType = async (req, res, next) => {
       error.statusCode = 404;
       throw error;
     }
-    const result = await getImageCloudinary(req.params.id, next);
+    const result = await getImageCloudinary(req.params.id);
     res.send({
       success: true,
       message: "Imagen consultada correctamente",
       data: {
         public_id: result.public_id,
+        display_name: result.display_name,
         secure_url: result.secure_url,
         url: result.url,
         format: result.format,

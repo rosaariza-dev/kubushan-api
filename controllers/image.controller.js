@@ -14,6 +14,7 @@ export const getImages = async (req, res, next) => {
     console.log(result);
     const filteredImages = result.resources.map((item) => ({
       public_id: item.public_id,
+      display_name: result.display_name,
       secure_url: item.secure_url,
       url: item.url,
       format: item.format,
@@ -40,6 +41,7 @@ export const getImage = async (req, res, next) => {
       message: "Imagen consultada correctamente",
       data: {
         public_id: result.public_id,
+        display_name: result.display_name,
         secure_url: result.secure_url,
         url: result.url,
         format: result.format,
@@ -84,7 +86,7 @@ export const deleteImage = async (req, res, next) => {
   }
 };
 
-export const deleteImageCloudinary = async (publicId, next) => {
+export const deleteImageCloudinary = async (publicId) => {
   try {
     return await new Promise((resolve, reject) => {
       const response = cloudinary.api.delete_resources(
@@ -99,11 +101,11 @@ export const deleteImageCloudinary = async (publicId, next) => {
       );
     });
   } catch (error) {
-    next(error);
+    throw error;
   }
 };
 
-export const getImageCloudinary = async (publicId, next) => {
+export const getImageCloudinary = async (publicId) => {
   try {
     const result = await cloudinary.api.resource(publicId);
     console.log(result);
@@ -115,11 +117,15 @@ export const getImageCloudinary = async (publicId, next) => {
       throw err;
     }
 
-    next(error);
+    throw error;
   }
 };
 
-export const uploadImageCloudinary = async (publicId, fileBuffer, next) => {
+export const uploadImageCloudinary = async (
+  publicId,
+  fileBuffer,
+  displayName
+) => {
   try {
     const options = {
       use_filename: true,
@@ -127,6 +133,7 @@ export const uploadImageCloudinary = async (publicId, fileBuffer, next) => {
       overwrite: false,
       resource_type: "image",
       public_id: publicId,
+      display_name: displayName,
     };
 
     if (!fileBuffer || fileBuffer.lenght === 0) {
@@ -150,6 +157,6 @@ export const uploadImageCloudinary = async (publicId, fileBuffer, next) => {
       stream.end(fileBuffer);
     });
   } catch (error) {
-    next(error);
+    throw error;
   }
 };
