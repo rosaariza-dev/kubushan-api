@@ -1,7 +1,32 @@
 import cloudinary from "../config/cloudinary.js";
 
-export const getImages = (req, res, next) => {
+export const getImages = async (req, res, next) => {
   try {
+    const result = await new Promise((resolve, reject) => {
+      const response = cloudinary.api.resources((error, data) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+    console.log(result);
+    const filteredImages = result.resources.map((item) => ({
+      public_id: item.public_id,
+      secure_url: item.secure_url,
+      url: item.url,
+      format: item.format,
+      width: item.width,
+      height: item.height,
+      resource_type: item.resource_type,
+      asset_folder: item.asset_folder,
+    }));
+    res.send({
+      success: true,
+      message: "Imagenes consultas exitosamente",
+      data: filteredImages,
+    });
   } catch (error) {
     next(error);
   }

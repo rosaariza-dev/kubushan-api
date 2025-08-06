@@ -1,13 +1,11 @@
 import { Router } from "express";
-import { getImage } from "../controllers/image.controller.js";
+import { getImage, getImages } from "../controllers/image.controller.js";
 import validateMiddleware from "../middlewares/validate.middleware.js";
 import { getImageSchema } from "../validations/image.schema.js";
 
 const imageRouter = Router();
 
-imageRouter.get("/", (req, res) => {
-  res.send({ message: "GET all images" });
-});
+imageRouter.get("/", getImages);
 
 imageRouter.get("/:publicId", validateMiddleware(getImageSchema), getImage);
 
