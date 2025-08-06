@@ -54,8 +54,50 @@ export const getImage = async (req, res, next) => {
   }
 };
 
-export const deleteImage = (req, res, next) => {
+export const deleteImage = async (req, res, next) => {
   try {
+    const result = await deleteImageCloudinary(req.params.publicId, next);
+    const statusImage = Object.values(result.deleted)[0];
+    if (statusImage === "not_found") {
+      const error = new Error(
+        `Image with publicId: ${req.params.publicId} not found`
+      );
+      error.statusCode = 404;
+      throw error;
+    }
+
+    if (statusImage !== "deleted") {
+      const error = new Error(
+        `Image could not be deleted, statusImage: ${statusImage} `
+      );
+      error.statusCode = 400;
+      throw error;
+    }
+
+    res.send({
+      success: true,
+      message: "Imagen eliminada exitosamente",
+      data: result.deleted,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteImageCloudinary = async (publicId, next) => {
+  try {
+    return await new Promise((resolve, reject) => {
+      const response = cloudinary.api.delete_resources(
+        publicId,
+        (error, data) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(data);
+          }
+        }
+      );
+    });
   } catch (error) {
     next(error);
   }
