@@ -4,6 +4,7 @@ import Product from "../models/product.model.js";
 import {
   deleteImageCloudinary,
   getImageCloudinary,
+  isValidUrlCloudinary,
   uploadImageCloudinary,
 } from "./image.controller.js";
 
@@ -149,11 +150,7 @@ export const uploadAndUpdateImageType = async (req, res, next) => {
       throw error;
     }
 
-    const regexUrlCloudinary =
-      "^https://res.cloudinary.com/[a-zA-Z0-9_-]+/image/upload/v\\d+/[a-zA-Z0-9_-]+\\.(jpg|jpeg|png|gif|webp|svg|bmp|tiff)$";
-    const cloudinaryRegex = new RegExp(regexUrlCloudinary);
-
-    if (type.image && cloudinaryRegex.test(type.image)) {
+    if (type.image && isValidUrlCloudinary(type.image)) {
       const error = new Error(
         `Type already has an image assigned : ${type.image}`
       );

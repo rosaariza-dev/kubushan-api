@@ -2,7 +2,9 @@ import mongoose from "mongoose";
 import Product from "../models/product.model.js";
 import Type from "../models/type.model.js";
 import {
+  deleteImageCloudinary,
   getImageCloudinary,
+  isValidUrlCloudinary,
   uploadImageCloudinary,
 } from "./image.controller.js";
 
@@ -135,38 +137,90 @@ export const deleteProduct = async (req, res, next) => {
   }
 };
 
-export const uploadImageProduct = async (req, res, next) => {
+export const uploadAndUpdateImageProduct = async (req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  let uploadImage = null;
+  let product = null;
   try {
-    const product = await Product.findById(req.params.id);
+    product = await Product.findById(req.params.id);
     if (!product) {
       const error = new Error("Product not found");
       error.statusCode = 404;
       throw error;
     }
-    const displayName = `prod_${product._id}`;
-    const result = await uploadImageCloudinary(
-      req.params.id,
-      req.body,
-      displayName
+
+    if (product.image && isValidUrlCloudinary(product.image)) {
+      const error = new Error(
+        `Product already has an image assigned : ${product.image}`
+      );
+      error.statusCode = 409;
+      throw error;
+    }
+
+    uploadImage = await uploadImageProduct(product, req.body);
+    const updateProduct = await Product.findByIdAndUpdate(
+      product._id,
+      { image: uploadImage.secure_url },
+      { new: true, session }
     );
-    console.log(result);
+    if (!updateProduct) {
+      const error = new Error(
+        "Failed to update product - Resource may have been deleted during operation"
+      );
+      error.statusCode = 409;
+      throw error;
+    }
+    await session.commitTransaction();
     res.send({
       success: true,
       message: "Imagen cargada correctamente",
       data: {
-        public_id: result.public_id,
-        display_name: result.display_name,
-        secure_url: result.secure_url,
-        url: result.url,
-        format: result.format,
-        width: result.width,
-        height: result.height,
-        resource_type: result.resource_type,
-        asset_folder: result.asset_folder,
+        updateProduct,
+        cloudinaryResult: uploadImage,
       },
     });
   } catch (error) {
+    await session.abortTransaction();
+    if (uploadImage) {
+      try {
+        console.log(product.id);
+        const deleteImage = await deleteImageCloudinary(product.id);
+        console.log("Image deleted successfully from Cloudinary", deleteImage);
+      } catch (deleteError) {
+        console.error("Error occurred while deleting the image:", deleteError);
+      }
+    }
     next(error);
+  } finally {
+    session.endSession();
+  }
+};
+
+export const uploadImageProduct = async (product, buffer) => {
+  try {
+    const displayName = `prod_${product._id}`;
+
+    const result = await uploadImageCloudinary(
+      product._id,
+      buffer,
+      displayName
+    );
+    console.log(result);
+    const response = {
+      public_id: result.public_id,
+      display_name: result.display_name,
+      secure_url: result.secure_url,
+      url: result.url,
+      format: result.format,
+      width: result.width,
+      height: result.height,
+      resource_type: result.resource_type,
+      asset_folder: result.asset_folder,
+    };
+    return response;
+  } catch (error) {
+    throw error;
   }
 };
 

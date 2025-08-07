@@ -6,7 +6,7 @@ import {
   getProduct,
   getProducts,
   updateProduct,
-  uploadImageProduct,
+  uploadAndUpdateImageProduct,
 } from "../controllers/product.controller.js";
 import validateMiddleware from "../middlewares/validate.middleware.js";
 import {
@@ -43,7 +43,7 @@ productRouter.post(
   "/:id/images",
   validateMiddleware(uploadImageProductSchema),
   validateImageMiddleware,
-  uploadImageProduct
+  uploadAndUpdateImageProduct
 );
 
 productRouter.get(

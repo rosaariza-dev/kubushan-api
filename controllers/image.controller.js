@@ -39,7 +39,7 @@ export const getImage = async (req, res, next) => {
     res.send({
       success: true,
       message: "Imagen consultada correctamente",
-      data: {                    
+      data: {
         public_id: result.public_id,
         display_name: result.display_name,
         secure_url: result.secure_url,
@@ -159,4 +159,11 @@ export const uploadImageCloudinary = async (
   } catch (error) {
     throw error;
   }
+};
+
+export const isValidUrlCloudinary = (url) => {
+  const regexUrlCloudinary =
+    "^https://res.cloudinary.com/[a-zA-Z0-9_-]+/image/upload/v\\d+/[a-zA-Z0-9_-]+\\.(jpg|jpeg|png|gif|webp|svg|bmp|tiff)$";
+  const cloudinaryRegex = new RegExp(regexUrlCloudinary);
+  return cloudinaryRegex.test(url);
 };
