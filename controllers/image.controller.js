@@ -14,7 +14,7 @@ export const getImages = async (req, res, next) => {
     console.log(result);
     const filteredImages = result.resources.map((item) => ({
       public_id: item.public_id,
-      display_name: result.display_name,
+      display_name: item.display_name, // se cambio result por item -> lo cual era un error
       secure_url: item.secure_url,
       url: item.url,
       format: item.format,
@@ -39,7 +39,7 @@ export const getImage = async (req, res, next) => {
     res.send({
       success: true,
       message: "Imagen consultada correctamente",
-      data: {
+      data: {                    
         public_id: result.public_id,
         display_name: result.display_name,
         secure_url: result.secure_url,

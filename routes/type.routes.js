@@ -7,7 +7,7 @@ import {
   getType,
   getTypes,
   updateType,
-  uploadImageType,
+  uploadAndUpdateImageType,
 } from "../controllers/type.controller.js";
 import validateMiddleware from "../middlewares/validate.middleware.js";
 import {
@@ -43,7 +43,7 @@ typeRouter.post(
   "/:id/images",
   validateMiddleware(uploadImageTypeSchema),
   validateImageMiddleware,
-  uploadImageType
+  uploadAndUpdateImageType
 );
 
 typeRouter.get(

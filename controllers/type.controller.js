@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Type from "../models/type.model.js";
 import Product from "../models/product.model.js";
 import {
+  deleteImageCloudinary,
   getImageCloudinary,
   uploadImageCloudinary,
 } from "./image.controller.js";
@@ -135,40 +136,90 @@ export const deleteType = async (req, res, next) => {
   }
 };
 
-export const uploadImageType = async (req, res, next) => {
+export const uploadAndUpdateImageType = async (req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  let uploadImage = null;
+  let type = null;
   try {
-    const type = await Type.findById(req.params.id);
+    type = await Type.findById(req.params.id);
     if (!type) {
       const error = new Error("Type not found");
       error.statusCode = 404;
       throw error;
     }
 
-    const displayName = `type_${type._id}`;
+    const regexUrlCloudinary =
+      "^https://res.cloudinary.com/[a-zA-Z0-9_-]+/image/upload/v\\d+/[a-zA-Z0-9_-]+\\.(jpg|jpeg|png|gif|webp|svg|bmp|tiff)$";
+    const cloudinaryRegex = new RegExp(regexUrlCloudinary);
 
-    const result = await uploadImageCloudinary(
+    if (type.image && cloudinaryRegex.test(type.image)) {
+      const error = new Error(
+        `Type already has an image assigned : ${type.image}`
+      );
+      error.statusCode = 409;
+      throw error;
+    }
+
+    uploadImage = await uploadImageType(type, req.body);
+    const updateType = await Type.findByIdAndUpdate(
       type._id,
-      req.body,
-      displayName
+      { image: uploadImage.secure_url },
+      { new: true, session }
     );
-    console.log(result);
+    if (!updateType) {
+      const error = new Error(
+        "Failed to update type - Resource may have been deleted during operation"
+      );
+      error.statusCode = 409;
+      throw error;
+    }
+    await session.commitTransaction();
     res.send({
       success: true,
       message: "Imagen cargada correctamente",
       data: {
-        public_id: result.public_id,
-        display_name: result.display_name,
-        secure_url: result.secure_url,
-        url: result.url,
-        format: result.format,
-        width: result.width,
-        height: result.height,
-        resource_type: result.resource_type,
-        asset_folder: result.asset_folder,
+        updateType,
+        cloudinaryResult: uploadImage,
       },
     });
   } catch (error) {
+    await session.abortTransaction();
+    if (uploadImage) {
+      try {
+        console.log(type.id);
+        const deleteImage = await deleteImageCloudinary(type.id);
+        console.log("Image deleted successfully from Cloudinary", deleteImage);
+      } catch (deleteError) {
+        console.error("Error occurred while deleting the image:", deleteError);
+      }
+    }
     next(error);
+  } finally {
+    session.endSession();
+  }
+};
+
+export const uploadImageType = async (type, buffer) => {
+  try {
+    const displayName = `type_${type._id}`;
+
+    const result = await uploadImageCloudinary(type._id, buffer, displayName);
+    console.log(result);
+    const response = {
+      public_id: result.public_id,
+      display_name: result.display_name,
+      secure_url: result.secure_url,
+      url: result.url,
+      format: result.format,
+      width: result.width,
+      height: result.height,
+      resource_type: result.resource_type,
+      asset_folder: result.asset_folder,
+    };
+    return response;
+  } catch (error) {
+    throw error;
   }
 };
 
