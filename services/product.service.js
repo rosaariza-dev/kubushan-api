@@ -10,6 +10,14 @@ export const findAllProducts = async () => {
   }
 };
 
+export const findProductsByType = async (type) => {
+  try {
+    return await Product.find({ type });
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const findProductById = async (id) => {
   try {
     const product = await Product.findById(id);

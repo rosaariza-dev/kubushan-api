@@ -1,19 +1,26 @@
 import mongoose from "mongoose";
-import Type from "../models/type.model.js";
 import {
   deleteImage,
   deleteImageCloudinary,
   getImageCloudinary,
   isValidUrlCloudinary,
   restoreImageCloudinary,
-  uploadImageCloudinary,
 } from "../services/cloudinary.service.js";
-import Product from "../models/product.model.js";
 import { formatImageResponse, sendSuccess } from "../utils/response.utils.js";
+import {
+  findAllTypes,
+  findTypeById,
+  findTypeByName,
+  insertType,
+  modifyType,
+  removeType,
+  uploadImageType,
+} from "../services/type.service.js";
+import { findProductsByType } from "../services/product.service.js";
 
 export const getTypes = async (req, res, next) => {
   try {
-    const types = await Type.find();
+    const types = await findAllTypes();
     sendSuccess(res, "Types successfully consulted", types);
   } catch (error) {
     next(error);
@@ -22,13 +29,7 @@ export const getTypes = async (req, res, next) => {
 
 export const getType = async (req, res, next) => {
   try {
-    const type = await Type.findById(req.params.id);
-    if (!type) {
-      const error = new Error("Type not found");
-      error.statusCode = 404;
-      throw error;
-    }
-
+    const type = await findTypeById(req.params.id);
     sendSuccess(res, "Type successfully consulted", type);
   } catch (error) {
     next(error);
@@ -37,17 +38,11 @@ export const getType = async (req, res, next) => {
 
 export const getProductsByType = async (req, res, next) => {
   try {
-    const type = await Type.findById(req.params.id);
-    if (!type) {
-      const error = new Error("Type not found");
-      error.statusCode = 404;
-      throw error;
-    }
-
-    const productsByType = await Product.find({ type: type._id });
+    const type = await findTypeById(req.params.id);
+    const productsByType = await findProductsByType(type._id);
     sendSuccess(
       res,
-      `Product of type: ${type.name} successfully consulted`,
+      `Products of type: ${type.name} successfully consulted`,
       productsByType
     );
   } catch (error) {
@@ -60,21 +55,21 @@ export const createType = async (req, res, next) => {
   session.startTransaction();
   try {
     const { name, image } = req.body;
-    const existingType = await Type.findOne({ name });
+    const existingType = await findTypeByName(name);
     if (existingType) {
       const error = new Error("Type already exits");
       error.statusCode = 409;
       throw error;
     }
 
-    const newTypes = await Type.create([{ name, image }], { session });
+    const newTypes = await insertType({ name, image }, session);
     await session.commitTransaction();
-    session.endSession();
     sendSuccess(res, "Type create successfully", newTypes[0], 201);
   } catch (error) {
     await session.abortTransaction();
-    session.endSession();
     next(error);
+  } finally {
+    session.endSession();
   }
 };
 
@@ -82,26 +77,19 @@ export const updateType = async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    const updateType = await Type.findByIdAndUpdate(
+    const updateType = await modifyType(
       req.params.id,
       { $set: req.body },
-      { new: true, session }
+      session
     );
-
-    if (!updateType) {
-      const error = new Error("Type not found");
-      error.statusCode = 404;
-      throw error;
-    }
-
     await session.commitTransaction();
-    session.endSession();
 
     sendSuccess(res, "Type update successfully", updateType);
   } catch (error) {
     await session.abortTransaction();
-    session.endSession();
     next(error);
+  } finally {
+    session.endSession();
   }
 };
 
@@ -109,21 +97,15 @@ export const deleteType = async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    const type = await Type.findById(req.params.id);
-    if (!type) {
-      const error = new Error("Type not found");
-      error.statusCode = 404;
-      throw error;
-    }
-
-    await Type.deleteOne({ _id: type._id }, { session });
+    const type = await findTypeById(req.params.id);
+    await removeType(type._id, session);
     await session.commitTransaction();
-    session.endSession();
     sendSuccess(res, "Type delete successfully", type);
   } catch (error) {
     await session.abortTransaction();
-    session.endSession();
     next(error);
+  } finally {
+    session.endSession();
   }
 };
 
@@ -133,12 +115,7 @@ export const uploadAndUpdateImageType = async (req, res, next) => {
   let uploadImage = null;
   let type = null;
   try {
-    type = await Type.findById(req.params.id);
-    if (!type) {
-      const error = new Error("Type not found");
-      error.statusCode = 404;
-      throw error;
-    }
+    type = await findTypeById(req.params.id);
 
     if (type.image && isValidUrlCloudinary(type.image)) {
       const error = new Error(
@@ -149,18 +126,11 @@ export const uploadAndUpdateImageType = async (req, res, next) => {
     }
 
     uploadImage = await uploadImageType(type, req.body);
-    const updateType = await Type.findByIdAndUpdate(
+    const updateType = await modifyType(
       type._id,
       { image: uploadImage.secure_url },
-      { new: true, session }
+      session
     );
-    if (!updateType) {
-      const error = new Error(
-        "Failed to update type - Resource may have been deleted during operation"
-      );
-      error.statusCode = 409;
-      throw error;
-    }
     await session.commitTransaction();
     data = {
       updateType,
@@ -184,25 +154,9 @@ export const uploadAndUpdateImageType = async (req, res, next) => {
   }
 };
 
-export const uploadImageType = async (type, buffer) => {
-  try {
-    const displayName = `type_${type._id}`;
-    const result = await uploadImageCloudinary(type._id, buffer, displayName);
-    const response = formatImageResponse(result);
-    return response;
-  } catch (error) {
-    throw error;
-  }
-};
-
 export const getImageType = async (req, res, next) => {
   try {
-    const type = await Type.findById(req.params.id);
-    if (!type) {
-      const error = new Error("Type not found");
-      error.statusCode = 404;
-      throw error;
-    }
+    await findTypeById(req.params.id);
     const result = await getImageCloudinary(req.params.id);
     const formatResult = formatImageResponse(result);
     sendSuccess(res, "Image successfully consulted", formatResult);
@@ -218,32 +172,15 @@ export const deleteAndUpdateImageType = async (req, res, next) => {
   let cloudinaryResult = null;
   let updateType = null;
   try {
-    type = await Type.findById(req.params.id);
-    if (!type) {
-      const error = new Error("Type not found");
-      error.statusCode = 404;
-      throw error;
-    }
+    type = await findTypeById(req.params.id);
+
     if (!type.image) {
       const error = new Error("No image assigned to this Type");
       error.statusCode = 400;
       throw error;
     }
     cloudinaryResult = await deleteImage(type.id);
-    updateType = await Type.findByIdAndUpdate(
-      type._id,
-      { image: null },
-      { new: true, session }
-    );
-
-    if (!updateType) {
-      const error = new Error(
-        "Failed to update type - Resource may have been deleted during operation"
-      );
-      error.statusCode = 409;
-      throw error;
-    }
-
+    updateType = await modifyType(type._id, { image: null }, session);
     await session.commitTransaction();
     data = {
       updateType,
