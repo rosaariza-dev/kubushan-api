@@ -2,7 +2,7 @@ import {
   getImageCloudinary,
   getImagesCloudinary,
 } from "../services/cloudinary.service.js";
-import { formatImageResponse } from "../utils/response.utils.js";
+import { formatImageResponse, sendSuccess } from "../utils/response.utils.js";
 
 export const getImages = async (req, res, next) => {
   try {
@@ -12,11 +12,7 @@ export const getImages = async (req, res, next) => {
       .filter((item) => item.bytes !== 0)
       .map((item) => formatImageResponse(item));
 
-    res.send({
-      success: true,
-      message: "Imagenes consultas exitosamente",
-      data: filteredImages,
-    });
+    sendSuccess(res, "Images successfully consulted", filteredImages);
   } catch (error) {
     next(error);
   }
@@ -25,13 +21,9 @@ export const getImages = async (req, res, next) => {
 export const getImage = async (req, res, next) => {
   try {
     const result = await getImageCloudinary(req.params.publicId);
-    const formatResult = formatImageResponse(result);
     console.log(result);
-      res.send({
-        success: true,
-        message: "Imagen consultada correctamente",
-        data: formatResult,
-      });
+    const formatResult = formatImageResponse(result);
+    sendSuccess(res, "Image successfully consulted", formatResult);
   } catch (error) {
     next(error);
   }

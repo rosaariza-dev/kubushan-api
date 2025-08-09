@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import Product from "../models/product.model.js";
 import Type from "../models/type.model.js";
-import { formatImageResponse } from "../utils/response.utils.js";
+import { formatImageResponse, sendSuccess } from "../utils/response.utils.js";
 import {
   deleteImage,
   deleteImageCloudinary,
@@ -14,7 +14,7 @@ import {
 export const getProducts = async (req, res, next) => {
   try {
     const products = await Product.find();
-    res.status(200).json({ success: true, data: products });
+    sendSuccess(res, "Products successfully consulted", products);
   } catch (error) {
     next(error);
   }
@@ -28,7 +28,7 @@ export const getProduct = async (req, res, next) => {
       error.statusCode = 404;
       throw error;
     }
-    res.status(200).json({ success: true, data: product });
+    sendSuccess(res, "Product successfully consulted", product);
   } catch (error) {
     next(error);
   }
@@ -61,11 +61,7 @@ export const createProduct = async (req, res, next) => {
     await session.commitTransaction();
     session.endSession();
 
-    res.status(201).json({
-      success: true,
-      message: "Product created successfully",
-      data: newProduct[0],
-    });
+    sendSuccess(res, "Product created successfully", newProduct[0], 201);
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -101,11 +97,7 @@ export const updateProduct = async (req, res, next) => {
     await session.commitTransaction();
     session.endSession();
 
-    res.status(200).json({
-      success: true,
-      message: "Product updated successfully",
-      data: updateProduct,
-    });
+    sendSuccess(res, "Product updated successfully", updateProduct);
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -128,11 +120,7 @@ export const deleteProduct = async (req, res, next) => {
     await session.commitTransaction();
     session.endSession();
 
-    res.status(200).json({
-      success: true,
-      message: "Product deleted successfully",
-      data: product,
-    });
+    sendSuccess(res, "Product deleted successfully", product);
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -175,14 +163,13 @@ export const uploadAndUpdateImageProduct = async (req, res, next) => {
       throw error;
     }
     await session.commitTransaction();
-    res.send({
-      success: true,
-      message: "Imagen cargada correctamente",
-      data: {
-        updateProduct,
-        cloudinaryResult: uploadImage,
-      },
-    });
+
+    data = {
+      updateProduct,
+      cloudinaryResult: uploadImage,
+    };
+
+    sendSuccess(res, "Image upload successfully", data);
   } catch (error) {
     await session.abortTransaction();
     if (uploadImage) {
@@ -227,11 +214,8 @@ export const getImageProduct = async (req, res, next) => {
     }
     const result = await getImageCloudinary(req.params.id);
     const formatResult = formatImageResponse(result);
-    res.send({
-      success: true,
-      message: "Imagen consultada correctamente",
-      data: formatResult,
-    });
+
+    sendSuccess(res, "Image successfully consulted", formatResult);
   } catch (error) {
     next(error);
   }
@@ -271,14 +255,11 @@ export const deleteAndUpdateImageProduct = async (req, res, next) => {
     }
 
     await session.commitTransaction();
-    res.send({
-      success: true,
-      message: "Imagen eliminada exitosamente",
-      data: {
-        updateProduct,
-        cloudinaryResult,
-      },
-    });
+    data = {
+      updateProduct,
+      cloudinaryResult,
+    };
+    sendSuccess(res, "Image successfully deleted", data);
   } catch (error) {
     await session.abortTransaction();
     if (cloudinaryResult) {

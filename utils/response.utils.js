@@ -1,6 +1,6 @@
 export const formatImageResponse = (cloudinaryResult) => {
   if (!cloudinaryResult) return null;
-  
+
   const {
     public_id,
     display_name,
@@ -10,9 +10,9 @@ export const formatImageResponse = (cloudinaryResult) => {
     width,
     height,
     resource_type,
-    asset_folder
+    asset_folder,
   } = cloudinaryResult;
-  
+
   return {
     public_id,
     display_name,
@@ -22,6 +22,19 @@ export const formatImageResponse = (cloudinaryResult) => {
     width,
     height,
     resource_type,
-    asset_folder
+    asset_folder,
   };
+};
+
+export const sendSuccess = (
+  res,
+  message = "Successful operation",
+  data = null,
+  statusCode = 200
+) => {
+  return res.status(statusCode).send({
+    success: true,
+    message,
+    data,
+  });
 };

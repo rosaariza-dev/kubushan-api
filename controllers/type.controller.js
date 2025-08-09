@@ -9,12 +9,12 @@ import {
   uploadImageCloudinary,
 } from "../services/cloudinary.service.js";
 import Product from "../models/product.model.js";
-import { formatImageResponse } from "../utils/response.utils.js";
+import { formatImageResponse, sendSuccess } from "../utils/response.utils.js";
 
 export const getTypes = async (req, res, next) => {
   try {
     const types = await Type.find();
-    res.status(200).json({ success: true, data: types });
+    sendSuccess(res, "Types successfully consulted", types);
   } catch (error) {
     next(error);
   }
@@ -29,7 +29,7 @@ export const getType = async (req, res, next) => {
       throw error;
     }
 
-    res.status(200).json({ success: true, data: type });
+    sendSuccess(res, "Type successfully consulted", type);
   } catch (error) {
     next(error);
   }
@@ -45,10 +45,11 @@ export const getProductsByType = async (req, res, next) => {
     }
 
     const productsByType = await Product.find({ type: type._id });
-    res.status(200).json({
-      success: true,
-      data: productsByType,
-    });
+    sendSuccess(
+      res,
+      `Product of type: ${type.name} successfully consulted`,
+      productsByType
+    );
   } catch (error) {
     next(error);
   }
@@ -69,12 +70,7 @@ export const createType = async (req, res, next) => {
     const newTypes = await Type.create([{ name, image }], { session });
     await session.commitTransaction();
     session.endSession();
-
-    res.status(201).json({
-      success: true,
-      message: "Type create successfully",
-      data: newTypes[0],
-    });
+    sendSuccess(res, "Type create successfully", newTypes[0], 201);
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -101,11 +97,7 @@ export const updateType = async (req, res, next) => {
     await session.commitTransaction();
     session.endSession();
 
-    res.status(200).json({
-      success: true,
-      message: "Type update successfully",
-      data: updateType,
-    });
+    sendSuccess(res, "Type update successfully", updateType);
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -127,12 +119,7 @@ export const deleteType = async (req, res, next) => {
     await Type.deleteOne({ _id: type._id }, { session });
     await session.commitTransaction();
     session.endSession();
-
-    res.status(200).json({
-      success: true,
-      message: "Type delete successfully",
-      data: type,
-    });
+    sendSuccess(res, "Type delete successfully", type);
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -175,14 +162,11 @@ export const uploadAndUpdateImageType = async (req, res, next) => {
       throw error;
     }
     await session.commitTransaction();
-    res.send({
-      success: true,
-      message: "Imagen cargada correctamente",
-      data: {
-        updateType,
-        cloudinaryResult: uploadImage,
-      },
-    });
+    data = {
+      updateType,
+      cloudinaryResult: uploadImage,
+    };
+    sendSuccess(res, "Image upload successfully", data);
   } catch (error) {
     await session.abortTransaction();
     if (uploadImage) {
@@ -221,11 +205,7 @@ export const getImageType = async (req, res, next) => {
     }
     const result = await getImageCloudinary(req.params.id);
     const formatResult = formatImageResponse(result);
-    res.send({
-      success: true,
-      message: "Imagen consultada correctamente",
-      data: formatResult,
-    });
+    sendSuccess(res, "Image successfully consulted", formatResult);
   } catch (error) {
     next(error);
   }
@@ -265,14 +245,11 @@ export const deleteAndUpdateImageType = async (req, res, next) => {
     }
 
     await session.commitTransaction();
-    res.send({
-      success: true,
-      message: "Imagen eliminada exitosamente",
-      data: {
-        updateType,
-        cloudinaryResult,
-      },
-    });
+    data = {
+      updateType,
+      cloudinaryResult,
+    };
+    sendSuccess(res, "Image successfully deleted", data);
   } catch (error) {
     await session.abortTransaction();
     if (cloudinaryResult) {
