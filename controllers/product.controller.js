@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Product from "../models/product.model.js";
 import Type from "../models/type.model.js";
+import { formatImageResponse } from "../utils/response.utils.js";
 import {
   deleteImage,
   deleteImageCloudinary,
@@ -8,7 +9,7 @@ import {
   isValidUrlCloudinary,
   restoreImageCloudinary,
   uploadImageCloudinary,
-} from "./image.controller.js";
+} from "../services/cloudinary.service.js";
 
 export const getProducts = async (req, res, next) => {
   try {
@@ -209,17 +210,7 @@ export const uploadImageProduct = async (product, buffer) => {
       displayName
     );
     console.log(result);
-    const response = {
-      public_id: result.public_id,
-      display_name: result.display_name,
-      secure_url: result.secure_url,
-      url: result.url,
-      format: result.format,
-      width: result.width,
-      height: result.height,
-      resource_type: result.resource_type,
-      asset_folder: result.asset_folder,
-    };
+    const response = formatImageResponse(result);
     return response;
   } catch (error) {
     throw error;
@@ -235,20 +226,11 @@ export const getImageProduct = async (req, res, next) => {
       throw error;
     }
     const result = await getImageCloudinary(req.params.id);
+    const formatResult = formatImageResponse(result);
     res.send({
       success: true,
       message: "Imagen consultada correctamente",
-      data: {
-        public_id: result.public_id,
-        display_name: result.display_name,
-        secure_url: result.secure_url,
-        url: result.url,
-        format: result.format,
-        width: result.width,
-        height: result.height,
-        resource_type: result.resource_type,
-        asset_folder: result.asset_folder,
-      },
+      data: formatResult,
     });
   } catch (error) {
     next(error);
