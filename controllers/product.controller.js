@@ -2,9 +2,11 @@ import mongoose from "mongoose";
 import Product from "../models/product.model.js";
 import Type from "../models/type.model.js";
 import {
+  deleteImage,
   deleteImageCloudinary,
   getImageCloudinary,
   isValidUrlCloudinary,
+  restoreImageCloudinary,
   uploadImageCloudinary,
 } from "./image.controller.js";
 
@@ -250,5 +252,71 @@ export const getImageProduct = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
+  }
+};
+
+export const deleteAndUpdateImageProduct = async (req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  let product = null;
+  let cloudinaryResult = null;
+  let updateProduct = null;
+  try {
+    product = await Product.findById(req.params.id);
+    if (!product) {
+      const error = new Error("Product not found");
+      error.statusCode = 404;
+      throw error;
+    }
+    if (!product.image) {
+      const error = new Error("No image assigned to this Product");
+      error.statusCode = 400;
+      throw error;
+    }
+    cloudinaryResult = await deleteImage(product.id);
+    updateProduct = await Product.findByIdAndUpdate(
+      product._id,
+      { image: null },
+      { new: true, session }
+    );
+
+    if (!updateProduct) {
+      const error = new Error(
+        "Failed to update product - Resource may have been deleted during operation"
+      );
+      error.statusCode = 409;
+      throw error;
+    }
+
+    await session.commitTransaction();
+    res.send({
+      success: true,
+      message: "Imagen eliminada exitosamente",
+      data: {
+        updateProduct,
+        cloudinaryResult,
+      },
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    if (cloudinaryResult) {
+      try {
+        const deleteImageProduct = await restoreImageCloudinary(product._id);
+        if (deleteImageProduct) {
+          console.log("Imagen deleted successfully:", deleteImageProduct);
+        } else {
+          console.log("Imagen not deleted:", deleteImageProduct);
+        }
+      } catch (error) {
+        console.log(
+          "Error occurred revert deleted operation - upload image",
+          error
+        );
+        throw error;
+      }
+    }
+    next(error);
+  } finally {
+    session.endSession();
   }
 };

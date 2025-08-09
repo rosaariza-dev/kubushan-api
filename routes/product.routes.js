@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createProduct,
+  deleteAndUpdateImageProduct,
   deleteProduct,
   getImageProduct,
   getProduct,
@@ -11,6 +12,7 @@ import {
 import validateMiddleware from "../middlewares/validate.middleware.js";
 import {
   createProductSchema,
+  deleteImageProductSchema,
   deleteProductSchema,
   getImageProductSchema,
   getProductSchema,
@@ -52,4 +54,9 @@ productRouter.get(
   getImageProduct
 );
 
+productRouter.delete(
+  "/:id/images",
+  validateMiddleware(deleteImageProductSchema),
+  deleteAndUpdateImageProduct
+);
 export default productRouter;

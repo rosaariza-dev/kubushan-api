@@ -36,6 +36,7 @@ const validateBodyProductSchema = object({
       .url("Product image is not a valid url")
       .trim()
       .min(10, "Product url must be greater than 10")
+      .nullable()
       .optional(),
     type: z
       .string({
@@ -62,3 +63,5 @@ export const deleteProductSchema = validateParamsSchema;
 export const uploadImageProductSchema = validateParamsSchema;
 
 export const getImageProductSchema = validateParamsSchema;
+
+export const deleteImageProductSchema = validateParamsSchema;

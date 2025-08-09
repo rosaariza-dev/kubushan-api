@@ -56,14 +56,12 @@ export const getImage = async (req, res, next) => {
   }
 };
 
-export const deleteImage = async (req, res, next) => {
+export const deleteImage = async (publicId) => {
   try {
-    const result = await deleteImageCloudinary(req.params.publicId, next);
+    const result = await deleteImageCloudinary(publicId);
     const statusImage = Object.values(result.deleted)[0];
     if (statusImage === "not_found") {
-      const error = new Error(
-        `Image with publicId: ${req.params.publicId} not found`
-      );
+      const error = new Error(`Image with publicId: ${publicId} not found`);
       error.statusCode = 404;
       throw error;
     }
@@ -76,13 +74,9 @@ export const deleteImage = async (req, res, next) => {
       throw error;
     }
 
-    res.send({
-      success: true,
-      message: "Imagen eliminada exitosamente",
-      data: result.deleted,
-    });
+    return result.deleted;
   } catch (error) {
-    next(error);
+    throw error;
   }
 };
 
@@ -109,6 +103,14 @@ export const getImageCloudinary = async (publicId) => {
   try {
     const result = await cloudinary.api.resource(publicId);
     console.log(result);
+    if (result.bytes === 0) {
+      const err = new Error(
+        `Image with publicId: ${publicId} is not exist. The image may have been deleted. Check the automatic backup of Cloudinary.`
+      );
+      err.statusCode = 400;
+      throw err;
+    }
+
     return result;
   } catch (error) {
     if (error.error && error.error.http_code === 404) {
@@ -159,6 +161,12 @@ export const uploadImageCloudinary = async (
   } catch (error) {
     throw error;
   }
+};
+
+export const restoreImageCloudinary = async (publicId) => {
+  const result = await cloudinary.api.restore(publicId);
+  console.log(result);
+  return result[publicId];
 };
 
 export const isValidUrlCloudinary = (url) => {
