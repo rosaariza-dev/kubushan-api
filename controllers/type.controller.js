@@ -17,6 +17,11 @@ import {
   uploadImageType,
 } from "../services/type.service.js";
 import { findProductsByType } from "../services/product.service.js";
+import {
+  typeAlreadyExits,
+  typeAlreadyHasImage,
+  typeImageNotExit,
+} from "../exceptions/type.exception.js";
 
 export const getTypes = async (req, res, next) => {
   try {
@@ -57,9 +62,7 @@ export const createType = async (req, res, next) => {
     const { name, image } = req.body;
     const existingType = await findTypeByName(name);
     if (existingType) {
-      const error = new Error("Type already exits");
-      error.statusCode = 409;
-      throw error;
+      typeAlreadyExits(name);
     }
 
     const newTypes = await insertType({ name, image }, session);
@@ -118,11 +121,7 @@ export const uploadAndUpdateImageType = async (req, res, next) => {
     type = await findTypeById(req.params.id);
 
     if (type.image && isValidUrlCloudinary(type.image)) {
-      const error = new Error(
-        `Type already has an image assigned : ${type.image}`
-      );
-      error.statusCode = 409;
-      throw error;
+      typeAlreadyHasImage(type.image);
     }
 
     uploadImage = await uploadImageType(type, req.body);
@@ -132,14 +131,14 @@ export const uploadAndUpdateImageType = async (req, res, next) => {
       session
     );
     await session.commitTransaction();
-    data = {
+    const data = {
       updateType,
       cloudinaryResult: uploadImage,
     };
     sendSuccess(res, "Image upload successfully", data);
   } catch (error) {
     await session.abortTransaction();
-    if (uploadImage) {
+    if (uploadImage && type) {
       try {
         console.log(type.id);
         const deleteImage = await deleteImageCloudinary(type.id);
@@ -175,21 +174,19 @@ export const deleteAndUpdateImageType = async (req, res, next) => {
     type = await findTypeById(req.params.id);
 
     if (!type.image) {
-      const error = new Error("No image assigned to this Type");
-      error.statusCode = 400;
-      throw error;
+      typeImageNotExit();
     }
     cloudinaryResult = await deleteImage(type.id);
     updateType = await modifyType(type._id, { image: null }, session);
     await session.commitTransaction();
-    data = {
+    const data = {
       updateType,
       cloudinaryResult,
     };
     sendSuccess(res, "Image successfully deleted", data);
   } catch (error) {
     await session.abortTransaction();
-    if (cloudinaryResult) {
+    if (cloudinaryResult && type) {
       try {
         const deleteImageType = await restoreImageCloudinary(type._id);
         if (deleteImageType) {

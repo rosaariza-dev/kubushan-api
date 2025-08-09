@@ -1,3 +1,4 @@
+import { typeNotFound } from "../exceptions/type.exception.js";
 import Type from "../models/type.model.js";
 import { formatImageResponse } from "../utils/response.utils.js";
 import { uploadImageCloudinary } from "./cloudinary.service.js";
@@ -15,9 +16,7 @@ export const findTypeById = async (id) => {
     const type = await Type.findById(id);
     console.log(type);
     if (!type) {
-      const error = new Error("Type not found");
-      error.statusCode = 404;
-      throw error;
+      typeNotFound(id);
     }
     return type;
   } catch (error) {
@@ -49,9 +48,7 @@ export const modifyType = async (id, type, session) => {
     });
 
     if (!updateType) {
-      const error = new Error("Type not found");
-      error.statusCode = 404;
-      throw error;
+      typeNotFound(id);
     }
     return updateType;
   } catch (error) {

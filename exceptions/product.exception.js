@@ -42,7 +42,7 @@ const productAlreadyHasImage = (image) => {
   const message = image
     ? `Product already has an image assigned : ${image}`
     : "Product already has an image assigned ";
-  throw new ProductAlreadyHasImage();
+  throw new ProductAlreadyHasImage(message);
 };
 
 const productImageNotExit = () => {
