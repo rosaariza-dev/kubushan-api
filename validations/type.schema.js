@@ -12,12 +12,13 @@ const validateBodyTypeSchema = object({
       })
       .trim()
       .min(2, "Type name must be greater than 2")
-      .lowercase(),
+      .toLowerCase(),
     image: z
       .url("Type image must be a valid url")
       .trim()
       .min(10, "Type image must be greater than 10")
-      .lowercase()
+      .toLowerCase()
+      .nullable()
       .optional(),
   }),
 });
@@ -38,3 +39,4 @@ export const deleteTypeSchema = validateParamsSchema;
 export const uploadImageTypeSchema = validateParamsSchema;
 
 export const getImageTypeSchema = validateParamsSchema;
+export const deleteImageTypeSchema = validateParamsSchema;

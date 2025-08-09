@@ -2,9 +2,11 @@ import mongoose from "mongoose";
 import Type from "../models/type.model.js";
 import Product from "../models/product.model.js";
 import {
+  deleteImage,
   deleteImageCloudinary,
   getImageCloudinary,
   isValidUrlCloudinary,
+  restoreImageCloudinary,
   uploadImageCloudinary,
 } from "./image.controller.js";
 
@@ -246,5 +248,71 @@ export const getImageType = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
+  }
+};
+
+export const deleteAndUpdateImageType = async (req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  let type = null;
+  let cloudinaryResult = null;
+  let updateType = null;
+  try {
+    type = await Type.findById(req.params.id);
+    if (!type) {
+      const error = new Error("Type not found");
+      error.statusCode = 404;
+      throw error;
+    }
+    if (!type.image) {
+      const error = new Error("No image assigned to this Type");
+      error.statusCode = 400;
+      throw error;
+    }
+    cloudinaryResult = await deleteImage(type.id);
+    updateType = await Type.findByIdAndUpdate(
+      type._id,
+      { image: null },
+      { new: true, session }
+    );
+
+    if (!updateType) {
+      const error = new Error(
+        "Failed to update type - Resource may have been deleted during operation"
+      );
+      error.statusCode = 409;
+      throw error;
+    }
+
+    await session.commitTransaction();
+    res.send({
+      success: true,
+      message: "Imagen eliminada exitosamente",
+      data: {
+        updateType,
+        cloudinaryResult,
+      },
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    if (cloudinaryResult) {
+      try {
+        const deleteImageType = await restoreImageCloudinary(type._id);
+        if (deleteImageType) {
+          console.log("Imagen deleted successfully:", deleteImageType);
+        } else {
+          console.log("Imagen not deleted:", deleteImageType);
+        }
+      } catch (error) {
+        console.log(
+          "Error occurred revert deleted operation - upload image",
+          error
+        );
+        throw error;
+      }
+    }
+    next(error);
+  } finally {
+    session.endSession();
   }
 };

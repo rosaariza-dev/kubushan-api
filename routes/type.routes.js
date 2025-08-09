@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createType,
+  deleteAndUpdateImageType,
   deleteType,
   getImageType,
   getProductsByType,
@@ -12,6 +13,7 @@ import {
 import validateMiddleware from "../middlewares/validate.middleware.js";
 import {
   createTypeSchema,
+  deleteImageTypeSchema,
   deleteTypeSchema,
   getImageTypeSchema,
   getProductsByTypeSchema,
@@ -50,6 +52,12 @@ typeRouter.get(
   "/:id/images",
   validateMiddleware(getImageTypeSchema),
   getImageType
+);
+
+typeRouter.delete(
+  "/:id/images",
+  validateMiddleware(deleteImageTypeSchema),
+  deleteAndUpdateImageType
 );
 
 export default typeRouter;
