@@ -1,6 +1,7 @@
-import Product from "../models/product.model";
-import { formatImageResponse } from "../utils/response.utils";
-import { uploadImageCloudinary } from "./cloudinary.service";
+import Product from "../models/product.model.js";
+import { formatImageResponse } from "../utils/response.utils.js";
+import { uploadImageCloudinary } from "./cloudinary.service.js";
+import { productNotFound } from "../exceptions/product.exception.js";
 
 export const findAllProducts = async () => {
   try {
@@ -21,10 +22,10 @@ export const findProductsByType = async (type) => {
 export const findProductById = async (id) => {
   try {
     const product = await Product.findById(id);
+    console.log("product");
+    console.log(product);
     if (!product) {
-      const error = new Error("Product not found");
-      error.statusCode = 404;
-      throw error;
+      productNotFound(id);
     }
     return product;
   } catch (error) {
@@ -56,9 +57,7 @@ export const modifyProduct = async (id, product, session) => {
     });
 
     if (!updateProduct) {
-      const error = new Error("Product not found");
-      error.statusCode = 404;
-      throw error;
+      productNotFound(id);
     }
     return updateProduct;
   } catch (error) {

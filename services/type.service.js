@@ -1,7 +1,6 @@
-import { id } from "zod/v4/locales";
-import Type from "../models/type.model";
-import { formatImageResponse } from "../utils/response.utils";
-import { uploadImageCloudinary } from "./cloudinary.service";
+import Type from "../models/type.model.js";
+import { formatImageResponse } from "../utils/response.utils.js";
+import { uploadImageCloudinary } from "./cloudinary.service.js";
 
 export const findAllTypes = async () => {
   try {
@@ -14,11 +13,13 @@ export const findAllTypes = async () => {
 export const findTypeById = async (id) => {
   try {
     const type = await Type.findById(id);
+    console.log(type);
     if (!type) {
       const error = new Error("Type not found");
       error.statusCode = 404;
       throw error;
     }
+    return type;
   } catch (error) {
     throw error;
   }

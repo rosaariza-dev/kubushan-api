@@ -17,6 +17,11 @@ import {
   uploadImageProduct,
 } from "../services/product.service.js";
 import { findTypeById } from "../services/type.service.js";
+import {
+  productAlreadyExits,
+  productAlreadyHasImage,
+  productImageNotExit,
+} from "../exceptions/product.exception.js";
 
 export const getProducts = async (req, res, next) => {
   try {
@@ -43,9 +48,7 @@ export const createProduct = async (req, res, next) => {
     const { title, type, ...rest } = req.body;
     const product = await findProductByTitle(title);
     if (product) {
-      const error = new Error("Product already exits");
-      error.statusCode = 409;
-      throw error;
+      productAlreadyExits(title);
     }
 
     const typeOfProduct = await findTypeById(type);
@@ -109,11 +112,7 @@ export const uploadAndUpdateImageProduct = async (req, res, next) => {
     product = await findProductById(req.params.id);
 
     if (product.image && isValidUrlCloudinary(product.image)) {
-      const error = new Error(
-        `Product already has an image assigned : ${product.image}`
-      );
-      error.statusCode = 409;
-      throw error;
+      productAlreadyHasImage(product.image);
     }
 
     uploadImage = await uploadImageProduct(product, req.body);
@@ -124,21 +123,21 @@ export const uploadAndUpdateImageProduct = async (req, res, next) => {
     );
     await session.commitTransaction();
 
-    data = {
+    const data = {
       updateProduct,
       cloudinaryResult: uploadImage,
     };
-
     sendSuccess(res, "Image upload successfully", data);
   } catch (error) {
     await session.abortTransaction();
-    if (uploadImage) {
+    if (uploadImage && product) {
       try {
         console.log(product.id);
         const deleteImage = await deleteImageCloudinary(product.id);
         console.log("Image deleted successfully from Cloudinary", deleteImage);
       } catch (deleteError) {
         console.error("Error occurred while deleting the image:", deleteError);
+        throw deleteError;
       }
     }
     next(error);
@@ -168,22 +167,20 @@ export const deleteAndUpdateImageProduct = async (req, res, next) => {
   try {
     product = await findProductById(req.params.id);
     if (!product.image) {
-      const error = new Error("No image assigned to this Product");
-      error.statusCode = 400;
-      throw error;
+      productImageNotExit();
     }
     cloudinaryResult = await deleteImage(product.id);
     updateProduct = await modifyProduct(product._id, { image: null }, session);
 
     await session.commitTransaction();
-    data = {
+    const data = {
       updateProduct,
       cloudinaryResult,
     };
     sendSuccess(res, "Image successfully deleted", data);
   } catch (error) {
     await session.abortTransaction();
-    if (cloudinaryResult) {
+    if (cloudinaryResult && product) {
       try {
         const deleteImageProduct = await restoreImageCloudinary(product._id);
         if (deleteImageProduct) {
