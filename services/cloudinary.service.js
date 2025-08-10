@@ -1,4 +1,10 @@
 import cloudinary from "../config/cloudinary.js";
+import {
+  fileNotFound,
+  imageNotContent,
+  imageNotDeleted,
+  imageNotFound,
+} from "../exceptions/image.exception.js";
 
 export const deleteImageCloudinary = async (publicId) => {
   try {
@@ -24,17 +30,11 @@ export const deleteImage = async (publicId) => {
     const result = await deleteImageCloudinary(publicId);
     const statusImage = Object.values(result.deleted)[0];
     if (statusImage === "not_found") {
-      const error = new Error(`Image with publicId: ${publicId} not found`);
-      error.statusCode = 404;
-      throw error;
+      imageNotFound(publicId);
     }
 
     if (statusImage !== "deleted") {
-      const error = new Error(
-        `Image could not be deleted, statusImage: ${statusImage} `
-      );
-      error.statusCode = 400;
-      throw error;
+      imageNotDeleted(statusImage);
     }
 
     return result.deleted;
@@ -62,19 +62,13 @@ export const getImageCloudinary = async (publicId) => {
     const result = await cloudinary.api.resource(publicId);
     console.log(result);
     if (result.bytes === 0) {
-      const err = new Error(
-        `Image with publicId: ${publicId} is not exist. The image may have been deleted. Check the automatic backup of Cloudinary.`
-      );
-      err.statusCode = 400;
-      throw err;
+      imageNotContent(publicId);
     }
 
     return result;
   } catch (error) {
     if (error.error && error.error.http_code === 404) {
-      const err = new Error(`Image with publicId: ${publicId} is not found.`);
-      err.statusCode = 404;
-      throw err;
+      imageNotFound(publicId);
     }
 
     throw error;
@@ -97,9 +91,7 @@ export const uploadImageCloudinary = async (
     };
 
     if (!fileBuffer || fileBuffer.lenght === 0) {
-      const error = new Error("File not found");
-      error.statusCode = 404;
-      throw error;
+      fileNotFound();
     }
 
     return await new Promise((resolve, reject) => {
