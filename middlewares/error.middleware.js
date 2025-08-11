@@ -41,6 +41,11 @@ const errorMiddleware = (err, req, res, next) => {
       error.statusCode = 400;
     }
 
+    logger.error("Unhandled request error", err, {
+      method: req.method,
+      url: req.originalUrl,
+    });
+
     res
       .status(error.statusCode || 500)
       .json({ success: false, error: error.message || "Server error" });
