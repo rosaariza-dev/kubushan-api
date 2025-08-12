@@ -1,4 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
+import logger from "../logger/index.js";
 
 // Return "https" URLs by setting secure: true
 const config = cloudinary.config({
@@ -6,11 +7,10 @@ const config = cloudinary.config({
 });
 
 // Log the configuration
-console.log(
-  config
-    ? `✅ Cloudinary configurado correctamente:`
-    : `❌ Error en la configuración de Cloudinary:`
-);
-console.dir(config);
+config
+  ? logger.info(`✅ Cloudinary configurado correctamente:`)
+  : logger.error(`❌ Error en la configuración de Cloudinary:`);
+
+logger.inspect("Configuración de cloudinary:", config);
 
 export default cloudinary;

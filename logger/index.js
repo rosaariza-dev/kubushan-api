@@ -1,4 +1,5 @@
 import winstonLogger from "../config/logger.js";
+import util from "util";
 
 class Logger {
   // Métodos básicos con correlation ID automático
@@ -24,6 +25,64 @@ class Logger {
     } else {
       winstonLogger.error(message, errorOrMeta || {});
     }
+  }
+
+  // Método para inspeccionar objetos con formato (equivalente a console.dir)
+  inspect(message, obj, options = {}) {
+    const defaultOptions = {
+      depth: null,
+      colors: true,
+      showHidden: false,
+      compact: false,
+    };
+
+    const inspectOptions = { ...defaultOptions, ...options };
+    const formattedObj = util.inspect(obj, inspectOptions);
+
+    winstonLogger.info(`${message}\n${formattedObj}`);
+  }
+
+  // Versión con nivel específico
+  inspectDebug(message, obj, options = {}) {
+    const defaultOptions = {
+      depth: null,
+      colors: true,
+      showHidden: false,
+      compact: false,
+    };
+
+    const inspectOptions = { ...defaultOptions, ...options };
+    const formattedObj = util.inspect(obj, inspectOptions);
+
+    winstonLogger.debug(`${message}\n${formattedObj}`);
+  }
+
+  inspectWarn(message, obj, options = {}) {
+    const defaultOptions = {
+      depth: null,
+      colors: true,
+      showHidden: false,
+      compact: false,
+    };
+
+    const inspectOptions = { ...defaultOptions, ...options };
+    const formattedObj = util.inspect(obj, inspectOptions);
+
+    winstonLogger.warn(`${message}\n${formattedObj}`);
+  }
+
+  inspectError(message, obj, options = {}) {
+    const defaultOptions = {
+      depth: null,
+      colors: true,
+      showHidden: false,
+      compact: false,
+    };
+
+    const inspectOptions = { ...defaultOptions, ...options };
+    const formattedObj = util.inspect(obj, inspectOptions);
+
+    winstonLogger.error(`${message}\n${formattedObj}`);
   }
 
   // Logging específico para HTTP requests
