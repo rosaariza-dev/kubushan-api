@@ -2,6 +2,7 @@ import winston from "winston";
 import httpContext from "express-http-context";
 import { NODE_ENV } from "./env.js";
 import DailyRotateFile from "winston-daily-rotate-file";
+import util from "util";
 import fs from "fs";
 
 // Crear carpetas de año/mes/dia antes de inicializar Winston
@@ -64,9 +65,7 @@ const winstonLogger = winston.createLogger({
   level: NODE_ENV === "production" ? "info" : "debug",
   format: logFormat,
   transports: [
-    new winston.transports.Console({
-      format: winston.format.combine(winston.format.colorize(), logFormat),
-    }),
+    new winston.transports.Console(),
 
     new DailyRotateFile({
       dirname: dir(),

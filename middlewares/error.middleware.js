@@ -1,4 +1,5 @@
 import { ZodError } from "zod/v4";
+import logger from "../logger/index.js";
 
 const errorMiddleware = (err, req, res, next) => {
   try {
@@ -41,7 +42,7 @@ const errorMiddleware = (err, req, res, next) => {
       error.statusCode = 400;
     }
 
-    logger.error("Unhandled request error", err, {
+    logger.inspectError("Unhandled request error", err, {
       method: req.method,
       url: req.originalUrl,
     });

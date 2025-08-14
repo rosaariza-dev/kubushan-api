@@ -8,9 +8,9 @@ const config = cloudinary.config({
 
 // Log the configuration
 config
-  ? logger.info(`✅ Cloudinary configurado correctamente:`)
-  : logger.error(`❌ Error en la configuración de Cloudinary:`);
+  ? logger.info(`✅ Cloudinary configurado correctamente`)
+  : logger.error(`❌ Error en la configuración de Cloudinary`);
 
-logger.inspect("Configuración de cloudinary:", config);
+logger.inspectDebug("Configuración de cloudinary:", config);
 
 export default cloudinary;

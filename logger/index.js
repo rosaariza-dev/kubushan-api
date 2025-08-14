@@ -28,10 +28,10 @@ class Logger {
   }
 
   // Método para inspeccionar objetos con formato (equivalente a console.dir)
-  inspect(message, obj, options = {}) {
+  inspect(message, obj, meta = {}, options = {}) {
     const defaultOptions = {
       depth: null,
-      colors: true,
+      colors: false,
       showHidden: false,
       compact: false,
     };
@@ -39,11 +39,11 @@ class Logger {
     const inspectOptions = { ...defaultOptions, ...options };
     const formattedObj = util.inspect(obj, inspectOptions);
 
-    winstonLogger.info(`${message}\n${formattedObj}`);
+    winstonLogger.info(`${message}\n${formattedObj}`, meta);
   }
 
   // Versión con nivel específico
-  inspectDebug(message, obj, options = {}) {
+  inspectDebug(message, obj, meta = {}, options = {}) {
     const defaultOptions = {
       depth: null,
       colors: true,
@@ -54,13 +54,13 @@ class Logger {
     const inspectOptions = { ...defaultOptions, ...options };
     const formattedObj = util.inspect(obj, inspectOptions);
 
-    winstonLogger.debug(`${message}\n${formattedObj}`);
+    winstonLogger.debug(`${message}\n${formattedObj}`, meta);
   }
 
-  inspectWarn(message, obj, options = {}) {
+  inspectWarn(message, obj, meta = {}, options = {}) {
     const defaultOptions = {
       depth: null,
-      colors: true,
+      colors: false,
       showHidden: false,
       compact: false,
     };
@@ -68,13 +68,13 @@ class Logger {
     const inspectOptions = { ...defaultOptions, ...options };
     const formattedObj = util.inspect(obj, inspectOptions);
 
-    winstonLogger.warn(`${message}\n${formattedObj}`);
+    winstonLogger.warn(`${message}\n${formattedObj}`, meta);
   }
 
-  inspectError(message, obj, options = {}) {
+  inspectError(message, obj, meta = {}, options = {}) {
     const defaultOptions = {
       depth: null,
-      colors: true,
+      colors: false,
       showHidden: false,
       compact: false,
     };
@@ -82,7 +82,7 @@ class Logger {
     const inspectOptions = { ...defaultOptions, ...options };
     const formattedObj = util.inspect(obj, inspectOptions);
 
-    winstonLogger.error(`${message}\n${formattedObj}`);
+    winstonLogger.error(`${message}\n${formattedObj}`, meta);
   }
 
   // Logging específico para HTTP requests
