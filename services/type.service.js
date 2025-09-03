@@ -73,3 +73,5 @@ export const uploadImageType = async (type, buffer) => {
     throw error;
   }
 };
+
+
