@@ -157,7 +157,7 @@ export const deleteProduct = async (req, res, next) => {
   session.startTransaction();
   try {
     const product = await findProductById(req.params.id);
-    logger.inspectDebug("Consulted if product exits", type);
+    logger.inspectDebug("Consulted if product exits", product); // se cambio type a product porque generaba un error
 
     await removeProduct(product._id, session);
     logger.inspectDebug(
@@ -328,7 +328,10 @@ export const deleteAndUpdateImageProduct = async (req, res, next) => {
     );
 
     updateProduct = await modifyProduct(product._id, { image: null }, session);
-    logger.inspectDebug("Product to delete image updated (awaiting database commit)", updateProduct);
+    logger.inspectDebug(
+      "Product to delete image updated (awaiting database commit)",
+      updateProduct
+    );
     await session.commitTransaction();
 
     const data = {
@@ -347,7 +350,7 @@ export const deleteAndUpdateImageProduct = async (req, res, next) => {
       { productId: req.params.id }
     );
     await session.abortTransaction();
-    
+
     if (cloudinaryResult && product) {
       try {
         const restoreImageProduct = await restoreImageCloudinary(product._id);
