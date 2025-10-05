@@ -12,12 +12,15 @@ import requestLogger from "./middlewares/request-logger.middleware.js";
 import logger from "./logger/index.js";
 import emailRouter from "./routes/email.routes.js";
 import cors from "cors";
+import { limiterGlobal } from "./middlewares/rate-limiter.middleware.js";
 
 const app = express();
 
 app.use(httpContext.middleware);
 // Correlation ID
 app.use(correlationMiddleware);
+
+app.use(limiterGlobal);
 
 app.use(
   cors({
