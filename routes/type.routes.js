@@ -22,6 +22,7 @@ import {
   uploadImageTypeSchema,
 } from "../validations/type.schema.js";
 import validateImageMiddleware from "../middlewares/image.middleware.js";
+import authorize from "../middlewares/auth.middleware.js";
 
 const typeRouter = Router();
 
@@ -35,14 +36,30 @@ typeRouter.get(
   getProductsByType
 );
 
-typeRouter.post("/", validateMiddleware(createTypeSchema), createType);
+typeRouter.post(
+  "/",
+  authorize,
+  validateMiddleware(createTypeSchema),
+  createType
+);
 
-typeRouter.put("/:id", validateMiddleware(updateTypeSchema), updateType);
+typeRouter.put(
+  "/:id",
+  authorize,
+  validateMiddleware(updateTypeSchema),
+  updateType
+);
 
-typeRouter.delete("/:id", validateMiddleware(deleteTypeSchema), deleteType);
+typeRouter.delete(
+  "/:id",
+  authorize,
+  validateMiddleware(deleteTypeSchema),
+  deleteType
+);
 
 typeRouter.post(
   "/:id/images",
+  authorize,
   validateMiddleware(uploadImageTypeSchema),
   validateImageMiddleware,
   uploadAndUpdateImageType
@@ -56,6 +73,7 @@ typeRouter.get(
 
 typeRouter.delete(
   "/:id/images",
+  authorize,
   validateMiddleware(deleteImageTypeSchema),
   deleteAndUpdateImageType
 );

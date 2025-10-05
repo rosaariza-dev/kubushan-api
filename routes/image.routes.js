@@ -1,17 +1,18 @@
 import { Router } from "express";
-import {
-  getImage,
-  getImages,
-} from "../controllers/image.controller.js";
+import { getImage, getImages } from "../controllers/image.controller.js";
 import validateMiddleware from "../middlewares/validate.middleware.js";
-import {
-  getImageSchema,
-} from "../validations/image.schema.js";
+import { getImageSchema } from "../validations/image.schema.js";
+import authorize from "../middlewares/auth.middleware.js";
 
 const imageRouter = Router();
 
-imageRouter.get("/", getImages);
+imageRouter.get("/", authorize, getImages);
 
-imageRouter.get("/:publicId", validateMiddleware(getImageSchema), getImage);
+imageRouter.get(
+  "/:publicId",
+  authorize,
+  validateMiddleware(getImageSchema),
+  getImage
+);
 
 export default imageRouter;

@@ -20,6 +20,7 @@ import {
   uploadImageProductSchema,
 } from "../validations/product.schema.js";
 import validateImageMiddleware from "../middlewares/image.middleware.js";
+import authorize from "../middlewares/auth.middleware.js";
 
 const productRouter = Router();
 
@@ -27,22 +28,30 @@ productRouter.get("/", getProducts);
 
 productRouter.get("/:id", validateMiddleware(getProductSchema), getProduct);
 
-productRouter.post("/", validateMiddleware(createProductSchema), createProduct);
+productRouter.post(
+  "/",
+  authorize,
+  validateMiddleware(createProductSchema),
+  createProduct
+);
 
 productRouter.put(
   "/:id",
+  authorize,
   validateMiddleware(updateProductSchema),
   updateProduct
 );
 
 productRouter.delete(
   "/:id",
+  authorize,
   validateMiddleware(deleteProductSchema),
   deleteProduct
 );
 
 productRouter.post(
   "/:id/images",
+  authorize,
   validateMiddleware(uploadImageProductSchema),
   validateImageMiddleware,
   uploadAndUpdateImageProduct
@@ -56,6 +65,7 @@ productRouter.get(
 
 productRouter.delete(
   "/:id/images",
+  authorize,
   validateMiddleware(deleteImageProductSchema),
   deleteAndUpdateImageProduct
 );
