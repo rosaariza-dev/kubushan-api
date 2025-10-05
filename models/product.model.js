@@ -7,14 +7,14 @@ const productSchema = new mongoose.Schema(
       required: [true, "Product title is required"],
       trim: true,
       lowercase: true,
-      minLenght: 2,
+      minLength: 2,
     },
     description: {
       type: String,
       required: [true, "Product description is required"],
       trim: true,
       lowercase: true,
-      minLenght: 2,
+      minLength: 2,
     },
     price: {
       type: Number,
@@ -24,7 +24,7 @@ const productSchema = new mongoose.Schema(
     image: {
       type: String,
       required: false,
-      minLenght: 10,
+      minLength: 10,
       trim: true,
       lowercase: true,
     },
