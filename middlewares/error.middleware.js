@@ -41,6 +41,18 @@ const errorMiddleware = (err, req, res, next) => {
       error.statusCode = 400;
     }
 
+    if (error.name === "TokenExpiredError") {
+      const message = "Token Expired";
+      error = new Error(message);
+      error.statusCode = 401;
+    }
+
+    if (error.name === "JsonWebTokenError") {
+      const message = "Invalid Token";
+      error = new Error(message);
+      error.statusCode = 401;
+    }
+
     logger.inspectError("Unhandled request error", err, {
       method: req.method,
       url: req.originalUrl,
