@@ -8,7 +8,7 @@ Incluye autenticación JWT, control de peticiones con rate limiting, manejo glob
 
 [🧩 Tecnologías utilizadas](#-tecnologías-utilizadas)
 
-[⚙️ Características principales](#-características-principales)
+[⚙️ Características principales](#caracteristicas-principales)
 
 [📁 Arquitectura del proyecto](#-arquitectura-del-proyecto)
 
@@ -26,57 +26,57 @@ Incluye autenticación JWT, control de peticiones con rate limiting, manejo glob
 
 - [🔑 Autenticación](#-autenticación)
 
-  [🔹 POST /api/v1/auth/login](#-post-/api/v1/auth/login)
+  [🔹 POST /api/v1/auth/login](#-post-apiv1authlogin)
 
-  [🔹 POST /api/v1/auth/register](#-post-/api/v1/auth/register)
+  [🔹 POST /api/v1/auth/register](#-post-apiv1authregister)
 
 - [💠 Tipos](#-tipos)
 
-  [🔹 GET /api/v1/types](#-get-/api/v1/types)
+  [🔹 GET /api/v1/types](#-get-apiv1types)
 
-  [🔹 GET /api/v1/types/:id](#-get-/api/v1/types/:id)
+  [🔹 GET /api/v1/types/:id](#-get-apiv1typesid)
 
-  [🔹 GET /api/v1/types/:id/products](#-get-/api/v1/types/:id/products)
+  [🔹 GET /api/v1/types/:id/products](#-get-apiv1typesidproducts)
 
-  [🔹 POST /api/v1/types](#-post-/api/v1/types)
+  [🔹 POST /api/v1/types](#-post-apiv1types)
 
-  [🔹 PUT /api/v1/types/:id](#-put-/api/v1/types/:id)
+  [🔹 PUT /api/v1/types/:id](#-put-apiv1typesid)
 
-  [🔹 DELETE /api/v1/types/:id](#-delete-/api/v1/types/:id)
+  [🔹 DELETE /api/v1/types/:id](#-delete-apiv1typesid)
 
-  [🔹 POST /api/v1/types/:id/images](#-post-/api/v1/types/:id/images)
+  [🔹 POST /api/v1/types/:id/images](#-post-apiv1typesidimages)
 
-  [🔹GET /api/v1/types/:id/images](#-get-/api/v1/types/:id/images)
+  [🔹GET /api/v1/types/:id/images](#-get-apiv1typesidimages)
 
-  [🔹 DELETE /api/v1/types/:id/images](#-delete-/api/v1/types/:id/images)
+  [🔹 DELETE /api/v1/types/:id/images](#-delete-apiv1typesidimages)
 
 - [📦 Productos](#-productos)
 
-  [🔹 GET /api/v1/products](#-get-/api/v1/products)
+  [🔹 GET /api/v1/products](#-get-apiv1products)
 
-  [🔹 GET /api/v1/products/:id](#-get-/api/v1/products/:id)
+  [🔹 GET /api/v1/products/:id](#-get-apiv1productsid)
 
-  [🔹 POST /api/v1/products](#-post-/api/v1/products)
+  [🔹 POST /api/v1/products](#-post-apiv1products)
 
-  [🔹 PUT /api/v1/products/:id](#-put-/api/v1/products/:id)
+  [🔹 PUT /api/v1/products/:id](#-put-apiv1productsid)
 
-  [🔹 DELETE /api/v1/products/:id](#-delete-/api/v1/products/:id)
+  [🔹 DELETE /api/v1/products/:id](#-delete-apiv1productsid)
 
-  [🔹 POST /api/v1/products/:id/images](#-post-/api/v1/products/:id/images)
+  [🔹 POST /api/v1/products/:id/images](#-post-apiv1productsidimages)
 
-  [🔹GET /api/v1/products/:id/images](#-get-/api/v1/products/:id/images)
+  [🔹GET /api/v1/products/:id/images](#-get-apiv1productsidimages)
 
-  [🔹 DELETE /api/v1/products/:id/images](#-delete-/api/v1/products/:id/images)
+  [🔹 DELETE /api/v1/products/:id/images](#-delete-apiv1productsidimages)
 
-- [🖼️ Imágenes](#-imágenes)
+- [🖼️ Imágenes](#imagenes)
 
-  [🔹 GET /api/v1/images](#-get-/api/v1/images)
+  [🔹 GET /api/v1/images](#-get-apiv1images)
 
-  [🔹 GET /api/v1/images/:publicId](#-get-/api/v1/images/:publicId)
+  [🔹 GET /api/v1/images/:publicId](#-get-apiv1imagespublicId)
 
 - [✉️ Suscripción](#-suscripción)
 
-  [🔹 POST /api/v1/email](#-post-/api/v1/email)
+  [🔹 POST /api/v1/email](#-post-apiv1email)
 
 [🚦 Rate Limiting](#-rate-limiting)
 
@@ -96,7 +96,7 @@ Incluye autenticación JWT, control de peticiones con rate limiting, manejo glob
 ![Zod](https://img.shields.io/badge/Zod/v4-3178C6?style=for-the-badge&logo=zod&logoColor=white)
 ![Cloudinary](https://img.shields.io/badge/Cloudinary-4285F4?style=for-the-badge&logo=cloudinary&logoColor=white)
 
-## ⚙️ Características principales
+## ⚙️ Características principales <a id="caracteristicas-principales"></a>
 
 🧱 **Arquitectura limpia y modular** → Separación clara por controladores, servicios, modelos y validaciones.
 
@@ -1124,7 +1124,7 @@ Elimina la imagen asociada al producto en Cloudinary y actualiza el registro en 
 
 - `500 Internal Server Error` → Error del servidor
 
-## 🖼️ Imágenes
+## 🖼️ Imágenes <a id="imagenes"></a>
 
 ### 🔹 GET `/api/v1/images`
 
