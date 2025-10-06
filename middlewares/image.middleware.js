@@ -6,7 +6,7 @@ import {
   fileNotFound,
   invalidContentType,
   invalidImageFormat,
-} from "../exceptions/image.exception";
+} from "../exceptions/image.exception.js";
 import logger from "../logger/index.js";
 
 const allowedTypes = [
