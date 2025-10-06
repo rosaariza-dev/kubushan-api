@@ -1,6 +1,11 @@
-import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "../config/env.js";
 import User from "../models/user.model.js";
+import {
+  accessDenied,
+  tokenInvalid,
+  tokenNotProviden,
+} from "../exceptions/auth.exception.js";
+import logger from "../logger/index.js";
+import { verifyToken } from "../services/auth.service.js";
 
 const authorize = async (req, res, next) => {
   try {
@@ -14,25 +19,22 @@ const authorize = async (req, res, next) => {
     }
 
     if (!token) {
-      const error = new Error("Token not providen");
-      error.statusCode = 401;
-      throw error;
+      logger.warn("Token not providen");
+      tokenNotProviden();
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = verifyToken(token);
 
     const user = await User.findById(decoded.id);
 
     if (!user) {
-      const error = new Error("Unathorized - User not found");
-      error.statusCode = 401;
-      throw error;
+      logger.warn("Invalid token, user not found");
+      tokenInvalid();
     }
 
     if (!user.isAdmin) {
-      const error = new Error("Unathorized - Admin access required");
-      error.statusCode = 403;
-      throw error;
+      logger.warn("Forbidden - Admin access required", { userId: user._id });
+      accessDenied();
     }
 
     next();

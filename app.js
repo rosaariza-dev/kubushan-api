@@ -13,6 +13,7 @@ import logger from "./logger/index.js";
 import emailRouter from "./routes/email.routes.js";
 import cors from "cors";
 import {
+  authLimiter,
   limiterGlobal,
   subscriptionLimiter,
 } from "./middlewares/rate-limiter.middleware.js";
@@ -39,7 +40,7 @@ app.use(express.json());
 app.use(requestLogger);
 
 // Routes
-app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/auth", authLimiter, authRouter);
 app.use("/api/v1/types", typeRouter);
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/images", imageRouter);

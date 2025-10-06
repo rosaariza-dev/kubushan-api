@@ -5,6 +5,12 @@ import jwt from "jsonwebtoken";
 import { JWT_EXPIRES_IN, JWT_SECRET } from "../config/env.js";
 import { sendSuccess } from "../utils/response.utils.js";
 import bcrypt from "bcryptjs";
+import {
+  invalidCredentials,
+  userAlreadyExits,
+  userNotFound,
+} from "../exceptions/auth.exception.js";
+import { generateToken } from "../services/auth.service.js";
 
 export const login = async (req, res, next) => {
   logger.info("Login starting..", { username: req.body.username });
@@ -14,30 +20,27 @@ export const login = async (req, res, next) => {
     const user = await User.findOne({ username });
     logger.inspectDebug(
       "check if there is a user with the same username",
-      user
+      user,
+      {
+        username,
+        alreadyExist: user ? true : false,
+      }
     );
 
     if (!user) {
-      logger.warn("User not found", { username });
-      const error = new Error("User not found");
-      error.statusCode = 404;
-      throw error;
+      logger.warn("Invalid credentials", { username });
+      invalidCredentials();
     }
 
     const isValidPassword = await bcrypt.compare(password, user.passwordHash);
 
     if (!isValidPassword) {
-      logger.warn("Invalid password", { username });
-      const error = new Error("Invalid Password");
-      error.statusCode = 404;
-      throw error;
+      logger.warn("Invalid credentials", { username });
+      invalidCredentials();
     }
 
-    const token = jwt.sign(
-      { id: user._id, isAdmin: user.isAdmin },
-      JWT_SECRET,
-      { expiresIn: JWT_EXPIRES_IN }
-    );
+    const token = generateToken({ id: user._id, isAdmin: user.isAdmin });
+
     logger.inspectDebug("token created", token, { username });
 
     sendSuccess(res, "User authenticated successfully", token);
@@ -68,9 +71,7 @@ export const register = async (req, res, next) => {
 
     if (user) {
       logger.warn("User already exists", { username });
-      const error = new Error("User already exists");
-      error.statusCode = 409;
-      throw error;
+      userAlreadyExits(username);
     }
 
     // hash password
@@ -91,20 +92,19 @@ export const register = async (req, res, next) => {
       newUser
     );
 
-    const token = jwt.sign(
-      { id: newUser._id, isAdmin: newUser.isAdmin },
-      JWT_SECRET,
-      {
-        expiresIn: JWT_EXPIRES_IN,
-      }
-    );
+    const token = generateToken({ id: newUser._id, isAdmin: newUser.isAdmin });
 
     logger.inspectDebug("Token created", token, { username });
     await session.commitTransaction();
 
     const { passwordHash, ...userSafe } = newUser[0].toObject();
 
-    sendSuccess(res, "User registered successfully", userSafe, 201);
+    sendSuccess(
+      res,
+      "User registered successfully",
+      { newUser: userSafe, token },
+      201
+    );
 
     logger.info("User created successfully", { userId: userSafe._id });
   } catch (error) {
