@@ -12,7 +12,10 @@ import requestLogger from "./middlewares/request-logger.middleware.js";
 import logger from "./logger/index.js";
 import emailRouter from "./routes/email.routes.js";
 import cors from "cors";
-import { limiterGlobal } from "./middlewares/rate-limiter.middleware.js";
+import {
+  limiterGlobal,
+  subscriptionLimiter,
+} from "./middlewares/rate-limiter.middleware.js";
 import authRouter from "./routes/auth.routes.js";
 
 const app = express();
@@ -40,7 +43,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/types", typeRouter);
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/images", imageRouter);
-app.use("/api/v1/email", emailRouter);
+app.use("/api/v1/email", subscriptionLimiter, emailRouter);
 
 app.use(errorMiddleware);
 

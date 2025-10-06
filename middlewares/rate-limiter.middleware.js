@@ -26,3 +26,12 @@ export const authLimiter = rateLimit({
   skipSuccessfulRequests: true, // No cuenta requests exitosos, cuenta login fallidos,
   handler: rateLimitHandler,
 });
+
+export const subscriptionLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 3,
+  message: "Too many email attempts, please try again after 15 minutes",
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: rateLimitHandler,
+});
