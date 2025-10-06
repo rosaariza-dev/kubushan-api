@@ -1,14 +1,11 @@
 import mongoose from "mongoose";
 import logger from "../logger/index.js";
 import User from "../models/user.model.js";
-import jwt from "jsonwebtoken";
-import { JWT_EXPIRES_IN, JWT_SECRET } from "../config/env.js";
 import { sendSuccess } from "../utils/response.utils.js";
 import bcrypt from "bcryptjs";
 import {
   invalidCredentials,
   userAlreadyExits,
-  userNotFound,
 } from "../exceptions/auth.exception.js";
 import { generateToken } from "../services/auth.service.js";
 
