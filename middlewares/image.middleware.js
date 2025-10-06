@@ -1,5 +1,13 @@
 import { fileTypeFromBuffer } from "file-type";
 import express from "express";
+import {
+  contentTypeRequired,
+  emptyFile,
+  fileNotFound,
+  invalidContentType,
+  invalidImageFormat,
+} from "../exceptions/image.exception";
+import logger from "../logger/index.js";
 
 const allowedTypes = [
   "image/jpeg",
@@ -17,41 +25,35 @@ const validateImageMiddleware = [
   }),
   async (req, res, next) => {
     try {
-      console.log("Validating image - Buffer length:", req.body?.length);
-      console.log("Content-Type:", req.headers["content-type"]);
+      logger.info("Validating image - Buffer length:", req.body?.length);
+      logger.info("Content-Type:", req.headers["content-type"]);
 
       const contentType = req.headers["content-type"];
 
       if (!contentType) {
-        const error = new Error("Content-type is required");
-        error.statusCode = 400;
-        throw error;
+        logger.warn("Content-type required", { contentType });
+        contentTypeRequired();
       }
       const isValidImageType =
         contentType.startsWith("image/") ||
         contentType === "application/octet-stream";
 
       if (!isValidImageType) {
-        const error = new Error(
-          `Invalid Content-Type: ${contentType}. Expected image/* or application/octet-stream`
-        );
-        error.statusCode = 400;
-        throw error;
+        logger.warn("Invalid content-type", { contentType });
+        invalidContentType();
       }
 
       if (!req.body || req.body.length === 0) {
-        const error = new Error("Empty file received");
-        error.statusCode = 404;
-        throw error;
+        logger.warn("Empty file");
+        emptyFile();
       }
 
       // Validar tipo de archivo
       const fileType = await fileTypeFromBuffer(req.body);
 
       if (!fileType || !allowedTypes.includes(fileType.mime)) {
-        const error = new Error("Invalid Image format.");
-        error.statusCode = 400;
-        throw error;
+        logger.warn("Invalid Image format.");
+        invalidImageFormat();
       }
 
       const contentLength = req.headers["content-length"];
@@ -60,15 +62,13 @@ const validateImageMiddleware = [
         const maxSize = 10 * 1024 * 1024; // 10MB
 
         if (size === 0 || isNaN(size)) {
-          const error = new Error("File not found");
-          error.statusCode = 404;
-          throw error;
+          logger.warn("File not found");
+          fileNotFound();
         }
 
         if (size > maxSize) {
-          const error = new Error(`File too large. Maximum ${maxSize} bytes`);
-          error.statusCode = 400;
-          throw error;
+          logger.warn("File too large", { size, maxSize });
+          fileTooLarge(maxSize);
         }
       }
       next();

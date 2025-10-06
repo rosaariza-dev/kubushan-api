@@ -6,6 +6,24 @@ class ImageNotFound extends BaseException {
   }
 }
 
+class InvalidImageFormat extends BaseException {
+  constructor(message = "Invalid Image format.") {
+    super(message, 400);
+  }
+}
+
+class FileTooLarge extends BaseException {
+  constructor(message = "File too large.") {
+    super(message, 413);
+  }
+}
+
+class EmptyFile extends BaseException {
+  constructor(message = "Empty file received.") {
+    super(message, 404);
+  }
+}
+
 class ImageNotDeleted extends BaseException {
   constructor(message = "Image could not be deleted") {
     super(message, 400);
@@ -23,6 +41,20 @@ class ImageNotContent extends BaseException {
 class FileNotFound extends BaseException {
   constructor(message = "File not found") {
     super(message, 404);
+  }
+}
+
+class ContentTypeRequired extends BaseException {
+  constructor(message = "Content-type is required") {
+    super(message, 400);
+  }
+}
+
+class InvalidContentType extends BaseException {
+  constructor(
+    message = "Invalid Content-Type. Expected image/* or application/octet-stream"
+  ) {
+    super(message, 400);
   }
 }
 
@@ -51,4 +83,40 @@ const fileNotFound = () => {
   throw new FileNotFound();
 };
 
-export { imageNotFound, imageNotDeleted, imageNotContent, fileNotFound };
+const invalidImageFormat = () => {
+  throw new InvalidImageFormat();
+};
+
+const fileTooLarge = (maxSize) => {
+  const message = maxSize
+    ? `File too large. Maximum ${maxSize} bytes`
+    : "File too large.";
+  throw new FileTooLarge(message);
+};
+
+const emptyFile = () => {
+  throw new EmptyFile();
+};
+
+const contentTypeRequired = () => {
+  throw new ContentTypeRequired();
+};
+
+const invalidContentType = (contentType) => {
+  const message = publicId
+    ? `Invalid Content-Type: ${contentType}. Expected image/* or application/octet-stream`
+    : "Invalid Content-Type. Expected image/* or application/octet-stream";
+  throw new InvalidContentType(message);
+};
+
+export {
+  imageNotFound,
+  imageNotDeleted,
+  imageNotContent,
+  fileNotFound,
+  invalidImageFormat,
+  fileTooLarge,
+  emptyFile,
+  contentTypeRequired,
+  invalidContentType,
+};
