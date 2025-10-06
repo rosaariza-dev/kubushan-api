@@ -5,6 +5,7 @@ import {
   imageNotDeleted,
   imageNotFound,
 } from "../exceptions/image.exception.js";
+import logger from "../logger/index.js";
 
 export const deleteImageCloudinary = async (publicId) => {
   try {
@@ -60,7 +61,6 @@ export const getImagesCloudinary = async () => {
 export const getImageCloudinary = async (publicId) => {
   try {
     const result = await cloudinary.api.resource(publicId);
-    console.log(result);
     if (result.bytes === 0) {
       imageNotContent(publicId);
     }
@@ -99,7 +99,7 @@ export const uploadImageCloudinary = async (
         options,
         (error, result) => {
           if (error) {
-            console.error("Error de Cloudinary:", error);
+            logger.inspectError("Error de Cloudinary:", error);
             reject(error);
           } else {
             resolve(result);
@@ -115,7 +115,9 @@ export const uploadImageCloudinary = async (
 
 export const restoreImageCloudinary = async (publicId) => {
   const result = await cloudinary.api.restore(publicId);
-  console.log(result);
+  logger.inspectDebug("Result of restore image of cloudinary", result, {
+    publicId,
+  });
   return result[publicId];
 };
 

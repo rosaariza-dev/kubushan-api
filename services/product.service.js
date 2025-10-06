@@ -22,8 +22,6 @@ export const findProductsByType = async (type) => {
 export const findProductById = async (id) => {
   try {
     const product = await Product.findById(id);
-    console.log("product");
-    console.log(product);
     if (!product) {
       productNotFound(id);
     }
@@ -78,7 +76,6 @@ export const uploadImageProduct = async (product, buffer) => {
       buffer,
       displayName
     );
-    console.log(result);
 
     return formatImageResponse(result);
   } catch (error) {

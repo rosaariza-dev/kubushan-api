@@ -14,7 +14,6 @@ export const findAllTypes = async () => {
 export const findTypeById = async (id) => {
   try {
     const type = await Type.findById(id);
-    console.log(type);
     if (!type) {
       typeNotFound(id);
     }
