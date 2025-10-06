@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 import { formatImageResponse, sendSuccess } from "../utils/response.utils.js";
 import {
   deleteImage,
-  deleteImageCloudinary,
   getImageCloudinary,
   isValidUrlCloudinary,
   restoreImageCloudinary,
@@ -237,13 +236,13 @@ export const uploadAndUpdateImageProduct = async (req, res, next) => {
     await session.abortTransaction();
     if (uploadImage && product) {
       try {
-        const deleteImage = await deleteImageCloudinary(product.id);
+        const imageDeleted = await deleteImage(product.id);
         logger.inspectDebug(
           "(Revert action) - Result to deleting image from cloudinary",
-          deleteImage,
+          imageDeleted,
           { publicId: product.id }
         );
-        if (deleteImage) {
+        if (imageDeleted) {
           logger.info(
             "(Revert action) - Image deleted successfully from cloudinary",
             { publicId: product.id }
