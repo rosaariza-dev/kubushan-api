@@ -624,7 +624,7 @@ Permite subir una imagen vinculada a un tipo de producto. La imagen se guarda en
 
 **Errores comunes**
 
-- `400 Bad Request` → La imagen no tiene un formato válido, el `Content-Type` es incorrecto o no se proporcionó, o el archivo excede el tamaño permitido
+- `400 Bad Request` → La imagen no tiene un formato válido, el `Content-Type` es incorrecto o no se proporcionó. También se devuelve este error si, durante la acción de compensación, la imagen no fue encontrada o no pudo eliminarse correctamente.
 
 - `401 Unauthorized` → Token inválido, expirado o no proporcionado
 
@@ -1025,7 +1025,7 @@ Permite subir una imagen vinculada a un producto específico. La imagen se guard
 
 **Errores comunes**
 
-- `400 Bad Request` → La imagen no tiene un formato válido, el `Content-Type` es incorrecto o no se proporcionó, o el archivo excede el tamaño permitido
+- `400 Bad Request` → La imagen no tiene un formato válido, el `Content-Type` es incorrecto o no se proporcionó. También se devuelve este error si, durante la acción de compensación, la imagen no fue encontrada o no pudo eliminarse correctamente.
 
 - `401 Unauthorized` → Token inválido, expirado o no proporcionado
 
