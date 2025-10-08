@@ -27,8 +27,9 @@ const createYearMonthDirectories = () => {
 };
 
 // Crear las carpetas necesarias
-createYearMonthDirectories();
+//createYearMonthDirectories();
 
+/* // crear directorio de logs
 const dir = () => {
   const now = new Date();
   const year = now.getFullYear();
@@ -36,6 +37,7 @@ const dir = () => {
   const day = String(now.getDate()).padStart(2, "0");
   return `logs/${year}/${month}/${day}`;
 };
+*/
 
 // Formato personalizado
 const logFormat = winston.format.combine(
@@ -67,6 +69,7 @@ const winstonLogger = winston.createLogger({
   transports: [
     new winston.transports.Console(),
 
+    /* // generar logs de archivo
     new DailyRotateFile({
       dirname: dir(),
       filename: "app_%DATE%.log",
@@ -85,6 +88,7 @@ const winstonLogger = winston.createLogger({
       maxFiles: "90d",
       auditFile: `${dir()}/error-audit.json`,
     }),
+    */
   ],
 });
 
