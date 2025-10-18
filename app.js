@@ -23,6 +23,8 @@ import botRouter from "./routes/bot.routes.js";
 
 const app = express();
 
+app.set("trust proxy", 1);
+
 app.use(httpContext.middleware);
 // Correlation ID
 app.use(correlationMiddleware);
