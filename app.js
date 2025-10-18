@@ -14,10 +14,12 @@ import emailRouter from "./routes/email.routes.js";
 import cors from "cors";
 import {
   authLimiter,
+  botLimiter,
   limiterGlobal,
   subscriptionLimiter,
 } from "./middlewares/rate-limiter.middleware.js";
 import authRouter from "./routes/auth.routes.js";
+import botRouter from "./routes/bot.routes.js";
 
 const app = express();
 
@@ -45,6 +47,7 @@ app.use("/api/v1/types", typeRouter);
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/images", imageRouter);
 app.use("/api/v1/email", subscriptionLimiter, emailRouter);
+app.use("/_internal/ping-keepalive", botLimiter, botRouter);
 
 app.use(errorMiddleware);
 

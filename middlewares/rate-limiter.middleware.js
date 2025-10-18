@@ -35,3 +35,12 @@ export const subscriptionLimiter = rateLimit({
   legacyHeaders: false,
   handler: rateLimitHandler,
 });
+
+export const botLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutos
+  max: 1,
+  message: "Too many email attempts to /ping, please try again later",
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: rateLimitHandler,
+});

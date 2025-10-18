@@ -11,4 +11,5 @@ export const {
   CLIENT_URL,
   JWT_SECRET,
   JWT_EXPIRES_IN,
+  PING_SECRET_KEY,
 } = process.env;
